@@ -12,13 +12,17 @@
 	
 	<link href="http://alexgorbatchev.com/pub/sh/current/styles/shThemeDefault.css" rel="stylesheet" type="text/css" />
 	
-	<pre class="brush: js">
-		function foo()
+	<pre class="brush: c">
+		int main(void)
 			{
-			 if (counter <= 10)
-            			return;
-        		// it works!
-			}
+			  kinit1(end, P2V(4*1024*1024)); // phys page allocator
+			  kvmalloc();      // kernel page table
+			  mpinit();        // collect info about this machine
+			  lapicinit(mpbcpu());
+			  seginit();       // set up segments
+			  cprintf("\ncpu%d: starting xv6\n\n", cpu->id);
+			  picinit();
+			  }
 	</pre>
 	
 	<!-- Finally, to actually run the highlighter, you need to include this JS on your page -->
