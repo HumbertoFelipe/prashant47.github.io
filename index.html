@@ -52,38 +52,17 @@
 
 		</nav>
 		
-		<table id="total-content" cellpadding="3">
+		<table id="topics" >
 			<tbody>
-				<tr></tr>
-				<tr class="odd">
-					<td class="num"></td>	
-					<td class="feature"></td>	
-					<td class="code"></td>	
-				</tr>
-				<tr class="odd">
-					<td class="num"></td>	
-					<td class="feature"></td>	
-					<td class="code"></td>	
+				<tr class="even">
+					<td><div class="box" style="background-color:red;"><p>Linkage Editor Design</p></div> </td>
+					<td><div class="box" style="background-color:blue;"><p>Porting System Library</p></div> </td>
+					<td><div class="box" style="background-color:green;"><p>Compiler and Interpreter </p></div> </td>
 				</tr>
 				<tr class="even">
-					<td class="num"></td>	
-					<td class="feature"></td>	
-					<td class="code"></td>	
-				</tr>
-				<tr class="even">
-					<td class="num"></td>	
-					<td class="feature"></td>	
-					<td class="code"></td>	
-				</tr>
-				<tr class="odd">
-					<td class="num"></td>	
-					<td class="feature"></td>	
-					<td class="code"></td>	
-				</tr>
-				<tr class="odd"
-					<td class="num"></td>	
-					<td class="feature"></td>	
-					<td class="code"></td>	
+					<td><div class="box" style="background-color:pink;"><p>File System Modification</p></div> </td>
+					<td><div class="box" style="background-color:yellow;"><p>Adding Systems Calls</p></div> </td>
+					<td><div class="box" style="background-color:red;"><p>Kernel and User Space</p></div> </td>
 				</tr>
 
 			</tbody>
@@ -91,6 +70,20 @@
 		</table>
 
 		<div class="centerbody">
+			<p>The primary objective of this project is to gain a detailed understanding of how computer systems work. For instance, when one types a command at the console, what is the chain of hardware and software events that lead to the command returning the correct value? This deep understanding is of practical and philosophical importance. It is practically immportant to understand how computer systems work when you are trying to make them do something new, either for research or industry. More philosophically, a computer scientist with an advanced degree should not view any part of the computer as "magic," but should either understand how it works or have the tools to figure it out
+
+			</p>
+		<pre class="brush: c">	
+		struct dinode {
+		  	short type;           // File type
+		    	short major;          // Major device number (T_DEV only)
+		      	short minor;          // Minor device number (T_DEV only)
+			short nlink;          // Number of links to inode in file system
+			uint size;            // Size of file (bytes)
+			uint addrs[NDIRECT+1];   // Data block addresses  *changes made
+		};
+		</pre>
+
 			<p> 
 			As a part of this project we demonstrated working of our proposed framework by
 			porting an interpreter named PicoC, C library named dietlibc and small in house linkage

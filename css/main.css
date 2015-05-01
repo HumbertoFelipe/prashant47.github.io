@@ -1,3 +1,5 @@
+@import url(http://fonts.googleapis.com/css?family=Indie+Flower);
+
 body {
 	 margin: 60px auto;
 	 width: 70%;
@@ -47,7 +49,6 @@ h3 {
 p {
 	font-size: 1.5em;
 	line-height: 1.4em;
-	color: #333;
 }
 footer {
 	border-top: 1px solid #d5d5d5;
@@ -66,58 +67,28 @@ ul.posts li {
 
 table#syllabus
 {
+color:green;
 }
 
-#syllabus .oddweek
+#topics .even .box
 {
-	background-color: rgb(245,245,220);
-}
-
-#syllabus .evenweek
-{
-	background-color: rgb(173,216,230);
-}
-
-#syllabus .num
-{
-	text-align: right;
-}
-
-#syllabus .day
-{
-	width: 80px;
-	text-align: center;
-}
-
-#syllabus .date
-{
-	width: 80px;
-	text-align: center;
-}
-
-#syllabus .topic
-{
-	width: 400px;
-	text-align: left;
 	padding-left: 20px;
 	font-weight: bold;        
-	text-valign: center;
+	text-align: center;
+/*font-family:'Sans-Serif';*/
 }
 
-#syllabus .assignment
-{
-	width: 400px;
-	text-align: left;
-	padding-left: 20px;
+#topics .even .box p {
+	padding-top:80px;
+	padding-left:20px;
+	padding-right:20px;
+	font-color:blue;
+	font-family:'Indie Flower';
+	font-size: 1.5em;
 }
 
-
-
-
-
-
-
-
-
-
-
+.box {
+	height:200px;
+	width:300px;
+	float:inline;
+}
