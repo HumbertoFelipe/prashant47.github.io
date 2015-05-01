@@ -2,12 +2,26 @@ body {
 	 margin: 60px auto;
 	 width: 70%;
 }
+#forkme {
+	display:block;
+	position:fixed;
+	z-index:5;
+	top:0px;
+	left:0px;
+	border:0px none;
+	background:url("../images/forkme.png") no-repeat scroll 0% 0% transparent;
+	width:149px;
+	height:149px;
+	text-indent:1000px;
+	overflow:hidden;
+}
 nav ul, footer ul {
 	font-family:'Helvetica', 'Arial', 'Sans-Serif';
 	padding: 0px;
 	list-style: none;
         font-weight: bold;
 	color: #999;
+	font-size: 1.5em;
 }
 nav ul li, footer ul li {
 	display: inline;
@@ -45,3 +59,62 @@ ul.posts {
 ul.posts li {
 	list-style: none;
 }
+
+
+table#syllabus
+{
+}
+
+#syllabus .oddweek
+{
+	background-color: rgb(245,245,220);
+}
+
+#syllabus .evenweek
+{
+	background-color: rgb(173,216,230);
+}
+
+#syllabus .num
+{
+	text-align: right;
+}
+
+#syllabus .day
+{
+	width: 80px;
+	text-align: center;
+}
+
+#syllabus .date
+{
+	width: 80px;
+	text-align: center;
+}
+
+#syllabus .topic
+{
+	width: 400px;
+	text-align: left;
+	padding-left: 20px;
+	font-weight: bold;        
+	text-valign: center;
+}
+
+#syllabus .assignment
+{
+	width: 400px;
+	text-align: left;
+	padding-left: 20px;
+}
+
+
+
+
+
+
+
+
+
+
+
