@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns# article: http://ogp.me/ns/article#">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width">
+  <title>Heuristic Intelligence - regression</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.1/css/bulma.min.css">
+    <link rel="stylesheet" href="/theme/css/main.365169ea.css">
+    <link rel="stylesheet" href="/theme/webassets-external/d28acd117c09f64922b4b269837c8127_print.css" media="print">
+  <!--[if IE]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+
+<body id="index" class="home">
+<header class="hero is-primary">
+  <div class="hero-head">
+    <div class="container">
+      <nav class="nav">
+        <div class="nav-left">
+          <a class="nav-item is-brand title is-3"
+             href="/">Heuristic Intelligence</a>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<nav class="nav has-shadow is-hidden-print">
+  <div class="container">
+    <div class="nav-center"></div>
+    <span id="navToggle" class="nav-toggle">
+      <span></span>
+      <span></span>
+      <span></span>
+    </span>
+    <div id="navMenu" class="nav-right nav-menu">
+          <a class="nav-item is-tab "
+             href="/category/machine-learning.html">Machine Learning</a>
+          <a class="nav-item is-tab "
+             href="/category/graphlab.html">GraphLab</a>
+          <a class="nav-item is-tab "
+             href="/category/general.html">General</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="section columns">
+    <div class="column is-three-quarters-desktop is-two-thirds-tablet">
+      <aside id="featured" class="body">
+        <article>
+          <h1 class="title">
+            <a href="/2016/Feb/15/predict_house_prices.html">Predict House Prices</a>
+          </h1>
+<footer class="post-info">
+  <abbr class="published" title="2016-02-15T12:00:00+05:30">
+    Published <span class="is-info">Mon 15 February 2016</span>
+    in <a href="/category/graphlab.html">GraphLab</a>
+  </abbr>
+
+    <p class="author">
+      <em>by           <a class="url fn" href="/author/prashant-gonarkar.html">Prashant Gonarkar</a>
+</em>
+      <span class="tag is-small"><a href="/tag/python.html">python</a></span>
+      <span class="tag is-small"><a href="/tag/regression.html">regression</a></span>
+    </p>
+  
+</footer>          <div class="section">
+            <p>In this article, we focused on using regression to predict a continuous value house prices from features of the house (e.g. square feet of living space, number of bedrooms,...). In this IPython Notebook, we are going to build a more accurate regression model for predicting house prices by including more features of the house. During this process, we are also going familiar with how the Python language can be used for data exploration .!</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">graphlab</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">graphlab</span><span class="o">.</span><span class="n">product_key</span><span class="o">.</span><span class="n">set_product_key</span><span class="p">()</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># CSV format data https://d396qusza40orc.cloudfront.net/phoenixassets/home_data.csv</span>
+<span class="n">sales</span> <span class="o">=</span> <span class="n">graphlab</span><span class="o">.</span><span class="n">SFrame</span><span class="p">(</span><span class="s1">&#39;coursera-notebooks/course-1/home_data.gl&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>[INFO] This non-commercial license of GraphLab Create is assigned to prashantgonarkar@gmail.com and will expire on February 13, 2017. For commercial licensing options, visit https://dato.com/buy/.
+
+[INFO] Start server at: ipc:///tmp/graphlab_server-1182 - Server binary: /usr/local/lib/python2.7/dist-packages/graphlab/unity_server - Server log: /tmp/graphlab_server_1455457362.log
+[INFO] GraphLab Server Version: 1.8
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">sales</span>
+</pre></div>
+
+
+<div style="max-height:1000px;max-width:1500px;overflow:auto;"><table frame="box" rules="cols">
+    <tr>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">id</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">date</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">price</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">bedrooms</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">bathrooms</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">sqft_living</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">sqft_lot</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">floors</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">waterfront</th>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">7129300520</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2014-10-13 00:00:00+00:00</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">221900</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1180</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">5650</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">6414100192</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2014-12-09 00:00:00+00:00</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">538000</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2.25</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2570</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">7242</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">5631500400</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2015-02-25 00:00:00+00:00</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">180000</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">770</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">10000</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2487200875</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2014-12-09 00:00:00+00:00</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">604000</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">4</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1960</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">5000</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1954400510</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2015-02-18 00:00:00+00:00</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">510000</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1680</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">8080</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">7237550310</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2014-05-12 00:00:00+00:00</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1225000</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">4</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">4.5</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">5420</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">101930</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1321400060</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2014-06-27 00:00:00+00:00</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">257500</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2.25</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1715</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">6819</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2008000270</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2015-01-15 00:00:00+00:00</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">291850</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1.5</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1060</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">9711</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2414600126</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2015-04-15 00:00:00+00:00</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">229500</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1780</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">7470</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3793500160</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2015-03-12 00:00:00+00:00</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">323000</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2.5</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1890</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">6560</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+    </tr>
+</table>
+<table frame="box" rules="cols">
+    <tr>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">view</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">condition</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">grade</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">sqft_above</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">sqft_basement</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">yr_built</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">yr_renovated</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">zipcode</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">lat</th>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">7</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1180</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1955</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">98178</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">47.51123398</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">7</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2170</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">400</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1951</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1991</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">98125</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">47.72102274</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">6</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">770</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1933</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">98028</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">47.73792661</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">5</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">7</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1050</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">910</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1965</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">98136</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">47.52082</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">8</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1680</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1987</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">98074</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">47.61681228</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">11</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3890</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1530</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2001</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">98053</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">47.65611835</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">7</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1715</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1995</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">98003</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">47.30972002</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">7</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1060</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1963</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">98198</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">47.40949984</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">7</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1050</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">730</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1960</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">98146</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">47.51229381</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">7</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1890</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2003</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">98038</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">47.36840673</td>
+    </tr>
+</table>
+<table frame="box" rules="cols">
+    <tr>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">long</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">sqft_living15</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">sqft_lot15</th>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">-122.25677536</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1340.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">5650.0</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">-122.3188624</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1690.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">7639.0</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">-122.23319601</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2720.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">8062.0</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">-122.39318505</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1360.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">5000.0</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">-122.04490059</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1800.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">7503.0</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">-122.00528655</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">4760.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">101930.0</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">-122.32704857</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2238.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">6819.0</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">-122.31457273</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1650.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">9711.0</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">-122.33659507</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1780.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">8113.0</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">-122.0308176</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2390.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">7570.0</td>
+    </tr>
+</table>
+[21613 rows x 21 columns]<br/>Note: Only the head of the SFrame is printed.<br/>You can use print_rows(num_rows=m, num_columns=n) to print more rows and columns.
+</div>
+
+<h1>Exploring the data</h1>
+<div class="highlight"><pre><span></span><span class="n">graphlab</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">set_target</span><span class="p">(</span><span class="s1">&#39;ipynb&#39;</span><span class="p">)</span>
+<span class="n">sales</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">view</span><span class="o">=</span><span class="s2">&quot;Scatter Plot&quot;</span><span class="p">,</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;sqft_living&quot;</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="s2">&quot;price&quot;</span><span class="p">)</span>
+</pre></div>
+
+
+<h1>Create simple regression model of sqft_livingto price</h1>
+<div class="highlight"><pre><span></span><span class="n">train_data</span><span class="p">,</span><span class="n">test_data</span> <span class="o">=</span> <span class="n">sales</span><span class="o">.</span><span class="n">random_split</span><span class="p">(</span><span class="o">.</span><span class="mi">8</span><span class="p">,</span><span class="n">seed</span><span class="o">=</span><span class="mi">471829</span><span class="p">)</span>
+</pre></div>
+
+
+<h2>Build the regression model</h2>
+<div class="highlight"><pre><span></span><span class="n">sqft_model</span> <span class="o">=</span> <span class="n">graphlab</span><span class="o">.</span><span class="n">linear_regression</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span><span class="n">target</span><span class="o">=</span><span class="s1">&#39;price&#39;</span><span class="p">,</span><span class="n">features</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sqft_living&#39;</span><span class="p">])</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Creating</span> <span class="n">a</span> <span class="n">validation</span> <span class="kd">set</span> <span class="n">from</span> <span class="mi">5</span> <span class="n">percent</span> <span class="n">of</span> <span class="n">training</span> <span class="n">data</span><span class="o">.</span> <span class="n">This</span> <span class="n">may</span> <span class="n">take</span> <span class="n">a</span> <span class="k">while</span><span class="o">.</span>
+          <span class="n">You</span> <span class="n">can</span> <span class="kd">set</span> <span class="err">``</span><span class="n">validation_set</span><span class="o">=</span><span class="n">None</span><span class="err">``</span> <span class="n">to</span> <span class="n">disable</span> <span class="n">validation</span> <span class="n">tracking</span><span class="o">.</span>
+
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Linear</span> <span class="n">regression</span><span class="o">:</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">--------------------------------------------------------</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">examples</span>          <span class="o">:</span> <span class="mi">16319</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">features</span>          <span class="o">:</span> <span class="mi">1</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">unpacked</span> <span class="n">features</span> <span class="o">:</span> <span class="mi">1</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">coefficients</span>    <span class="o">:</span> <span class="mi">2</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Starting</span> <span class="n">Newton</span> <span class="n">Method</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">--------------------------------------------------------</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">+-----------+----------+--------------+--------------------+----------------------+---------------+-----------------+</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">|</span> <span class="n">Iteration</span> <span class="o">|</span> <span class="n">Passes</span>   <span class="o">|</span> <span class="n">Elapsed</span> <span class="n">Time</span> <span class="o">|</span> <span class="n">Training</span><span class="o">-</span><span class="n">max_error</span> <span class="o">|</span> <span class="n">Validation</span><span class="o">-</span><span class="n">max_error</span> <span class="o">|</span> <span class="n">Training</span><span class="o">-</span><span class="n">rmse</span> <span class="o">|</span> <span class="n">Validation</span><span class="o">-</span><span class="n">rmse</span> <span class="o">|</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">+-----------+----------+--------------+--------------------+----------------------+---------------+-----------------+</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">|</span> <span class="mi">1</span>         <span class="o">|</span> <span class="mi">2</span>        <span class="o">|</span> <span class="mf">1.003736</span>     <span class="o">|</span> <span class="mf">4333270.446305</span>     <span class="o">|</span> <span class="mf">2128076.109406</span>       <span class="o">|</span> <span class="mf">263914.025655</span> <span class="o">|</span> <span class="mf">245344.423754</span>   <span class="o">|</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">+-----------+----------+--------------+--------------------+----------------------+---------------+-----------------+</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">SUCCESS</span><span class="o">:</span> <span class="n">Optimal</span> <span class="n">solution</span> <span class="n">found</span><span class="o">.</span>
+<span class="n">PROGRESS</span><span class="o">:</span>
+</pre></div>
+
+
+<h1>Evaluate simple model</h1>
+<div class="highlight"><pre><span></span><span class="k">print</span> <span class="n">test_data</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>540004.882899
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">sqft_model</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">test_data</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>{&#39;max_error&#39;: 3254412.8838123637, &#39;rmse&#39;: 255356.74724801505}
+</pre></div>
+
+
+<h1>Let's show what our predictions look like</h1>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">test_data</span><span class="p">[</span><span class="s1">&#39;sqft_living&#39;</span><span class="p">],</span><span class="n">test_data</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">],</span><span class="s1">&#39;.&#39;</span><span class="p">,</span>
+         <span class="n">test_data</span><span class="p">[</span><span class="s1">&#39;sqft_living&#39;</span><span class="p">],</span><span class="n">sqft_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_data</span><span class="p">),</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x7f0e4c130390&gt;,
+ &lt;matplotlib.lines.Line2D at 0x7f0e70d7c650&gt;]
+</pre></div>
+
+
+<p><img alt="png" src="output_17_1.png"></p>
+<div class="highlight"><pre><span></span><span class="n">sqft_model</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;coefficients&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<div style="max-height:1000px;max-width:1500px;overflow:auto;"><table frame="box" rules="cols">
+    <tr>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">name</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">index</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">value</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">stderr</th>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">(intercept)</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">None</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">-49529.3244096</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">5126.67769256</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">sqft_living</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">None</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">283.506960839</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2.25772750653</td>
+    </tr>
+</table>
+[2 rows x 4 columns]<br/>
+</div>
+
+<h2>Explore other features  in the data</h2>
+<div class="highlight"><pre><span></span><span class="n">my_features</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">,</span><span class="s1">&#39;bathrooms&#39;</span><span class="p">,</span><span class="s1">&#39;sqft_living&#39;</span><span class="p">,</span><span class="s1">&#39;sqft_lot&#39;</span><span class="p">,</span><span class="s1">&#39;floors&#39;</span><span class="p">,</span><span class="s1">&#39;zipcode&#39;</span><span class="p">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">sales</span><span class="p">[</span><span class="n">my_features</span><span class="p">]</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">sales</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">view</span><span class="o">=</span><span class="s2">&quot;BoxWhisker Plot&quot;</span><span class="p">,</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;zipcode&#39;</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;price&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<h1>Build a regression model with more number of features</h1>
+<div class="highlight"><pre><span></span><span class="n">my_feature_model</span> <span class="o">=</span> <span class="n">graphlab</span><span class="o">.</span><span class="n">linear_regression</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span><span class="n">target</span><span class="o">=</span><span class="s1">&#39;price&#39;</span><span class="p">,</span><span class="n">features</span><span class="o">=</span><span class="n">my_features</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Creating</span> <span class="n">a</span> <span class="n">validation</span> <span class="kd">set</span> <span class="n">from</span> <span class="mi">5</span> <span class="n">percent</span> <span class="n">of</span> <span class="n">training</span> <span class="n">data</span><span class="o">.</span> <span class="n">This</span> <span class="n">may</span> <span class="n">take</span> <span class="n">a</span> <span class="k">while</span><span class="o">.</span>
+          <span class="n">You</span> <span class="n">can</span> <span class="kd">set</span> <span class="err">``</span><span class="n">validation_set</span><span class="o">=</span><span class="n">None</span><span class="err">``</span> <span class="n">to</span> <span class="n">disable</span> <span class="n">validation</span> <span class="n">tracking</span><span class="o">.</span>
+
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Linear</span> <span class="n">regression</span><span class="o">:</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">--------------------------------------------------------</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">examples</span>          <span class="o">:</span> <span class="mi">16367</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">features</span>          <span class="o">:</span> <span class="mi">6</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">unpacked</span> <span class="n">features</span> <span class="o">:</span> <span class="mi">6</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">coefficients</span>    <span class="o">:</span> <span class="mi">118</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Starting</span> <span class="n">Newton</span> <span class="n">Method</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">--------------------------------------------------------</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">+-----------+----------+--------------+--------------------+----------------------+---------------+-----------------+</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">|</span> <span class="n">Iteration</span> <span class="o">|</span> <span class="n">Passes</span>   <span class="o">|</span> <span class="n">Elapsed</span> <span class="n">Time</span> <span class="o">|</span> <span class="n">Training</span><span class="o">-</span><span class="n">max_error</span> <span class="o">|</span> <span class="n">Validation</span><span class="o">-</span><span class="n">max_error</span> <span class="o">|</span> <span class="n">Training</span><span class="o">-</span><span class="n">rmse</span> <span class="o">|</span> <span class="n">Validation</span><span class="o">-</span><span class="n">rmse</span> <span class="o">|</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">+-----------+----------+--------------+--------------------+----------------------+---------------+-----------------+</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">|</span> <span class="mi">1</span>         <span class="o">|</span> <span class="mi">2</span>        <span class="o">|</span> <span class="mf">0.037789</span>     <span class="o">|</span> <span class="mf">3769052.655633</span>     <span class="o">|</span> <span class="mf">1309832.673966</span>       <span class="o">|</span> <span class="mf">180398.263404</span> <span class="o">|</span> <span class="mf">157403.059497</span>   <span class="o">|</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">+-----------+----------+--------------+--------------------+----------------------+---------------+-----------------+</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">SUCCESS</span><span class="o">:</span> <span class="n">Optimal</span> <span class="n">solution</span> <span class="n">found</span><span class="o">.</span>
+<span class="n">PROGRESS</span><span class="o">:</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="k">print</span> <span class="n">my_features</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>[&#39;bedrooms&#39;, &#39;bathrooms&#39;, &#39;sqft_living&#39;, &#39;sqft_lot&#39;, &#39;floors&#39;, &#39;zipcode&#39;]
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="k">print</span> <span class="n">sqft_model</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">test_data</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">my_feature_model</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">test_data</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>{&#39;max_error&#39;: 3254412.8838123637, &#39;rmse&#39;: 255356.74724801505}
+{&#39;max_error&#39;: 2589520.1383550493, &#39;rmse&#39;: 184401.4046152276}
+</pre></div>
+
+
+<h2>Apply learned model to predict prices of 3 houses</h2>
+<div class="highlight"><pre><span></span><span class="n">house1</span> <span class="o">=</span> <span class="n">sales</span><span class="p">[</span><span class="n">sales</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;5309101200&#39;</span><span class="p">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">house1</span>
+</pre></div>
+
+
+<div style="max-height:1000px;max-width:1500px;overflow:auto;"><table frame="box" rules="cols">
+    <tr>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">id</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">date</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">price</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">bedrooms</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">bathrooms</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">sqft_living</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">sqft_lot</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">floors</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">waterfront</th>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">5309101200</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2014-06-05 00:00:00+00:00</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">620000</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">4</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2.25</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2400</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">5350</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1.5</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+    </tr>
+</table>
+<table frame="box" rules="cols">
+    <tr>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">view</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">condition</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">grade</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">sqft_above</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">sqft_basement</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">yr_built</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">yr_renovated</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">zipcode</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">lat</th>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">4</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">7</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1460</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">940</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1929</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">98117</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">47.67632376</td>
+    </tr>
+</table>
+<table frame="box" rules="cols">
+    <tr>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">long</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">sqft_living15</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">sqft_lot15</th>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">-122.37010126</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1250.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">4880.0</td>
+    </tr>
+</table>
+[? rows x 21 columns]<br/>Note: Only the head of the SFrame is printed. This SFrame is lazily evaluated.<br/>You can use len(sf) to force materialization.
+</div>
+
+<div class="highlight"><pre><span></span><span class="k">print</span> <span class="n">house1</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>[620000, ... ]
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="k">print</span> <span class="n">sqft_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">house1</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>[630887.3816030392]
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="k">print</span> <span class="n">my_feature_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">house1</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>[714261.664157509]
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1">## Prediction for second fancier house</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">house2</span> <span class="o">=</span> <span class="n">sales</span><span class="p">[</span><span class="n">sales</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1925069082&#39;</span><span class="p">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">house2</span>
+</pre></div>
+
+
+<div style="max-height:1000px;max-width:1500px;overflow:auto;"><table frame="box" rules="cols">
+    <tr>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">id</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">date</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">price</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">bedrooms</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">bathrooms</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">sqft_living</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">sqft_lot</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">floors</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">waterfront</th>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1925069082</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2015-05-11 00:00:00+00:00</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2200000</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">5</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">4.25</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">4640</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">22703</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+    </tr>
+</table>
+<table frame="box" rules="cols">
+    <tr>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">view</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">condition</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">grade</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">sqft_above</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">sqft_basement</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">yr_built</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">yr_renovated</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">zipcode</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">lat</th>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">4</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">5</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">8</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2860</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1780</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1952</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">98052</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">47.63925783</td>
+    </tr>
+</table>
+<table frame="box" rules="cols">
+    <tr>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">long</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">sqft_living15</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">sqft_lot15</th>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">-122.09722322</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3140.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">14200.0</td>
+    </tr>
+</table>
+[? rows x 21 columns]<br/>Note: Only the head of the SFrame is printed. This SFrame is lazily evaluated.<br/>You can use len(sf) to force materialization.
+</div>
+
+<div class="highlight"><pre><span></span><span class="k">print</span> <span class="n">sqft_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">house2</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>[1265942.9738814957]
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="k">print</span> <span class="n">my_feature_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">house2</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>[1430234.255513107]
+</pre></div>
+
+
+<h2>last house, super fancy</h2>
+<div class="highlight"><pre><span></span><span class="n">bill_gates</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">:[</span><span class="mi">8</span><span class="p">],</span> 
+              <span class="s1">&#39;bathrooms&#39;</span><span class="p">:[</span><span class="mi">25</span><span class="p">],</span> 
+              <span class="s1">&#39;sqft_living&#39;</span><span class="p">:[</span><span class="mi">50000</span><span class="p">],</span> 
+              <span class="s1">&#39;sqft_lot&#39;</span><span class="p">:[</span><span class="mi">225000</span><span class="p">],</span>
+              <span class="s1">&#39;floors&#39;</span><span class="p">:[</span><span class="mi">4</span><span class="p">],</span> 
+              <span class="s1">&#39;zipcode&#39;</span><span class="p">:[</span><span class="s1">&#39;98039&#39;</span><span class="p">],</span> 
+              <span class="s1">&#39;condition&#39;</span><span class="p">:[</span><span class="mi">10</span><span class="p">],</span> 
+              <span class="s1">&#39;grade&#39;</span><span class="p">:[</span><span class="mi">10</span><span class="p">],</span>
+              <span class="s1">&#39;waterfront&#39;</span><span class="p">:[</span><span class="mi">1</span><span class="p">],</span>
+              <span class="s1">&#39;view&#39;</span><span class="p">:[</span><span class="mi">4</span><span class="p">],</span>
+              <span class="s1">&#39;sqft_above&#39;</span><span class="p">:[</span><span class="mi">37500</span><span class="p">],</span>
+              <span class="s1">&#39;sqft_basement&#39;</span><span class="p">:[</span><span class="mi">12500</span><span class="p">],</span>
+              <span class="s1">&#39;yr_built&#39;</span><span class="p">:[</span><span class="mi">1994</span><span class="p">],</span>
+              <span class="s1">&#39;yr_renovated&#39;</span><span class="p">:[</span><span class="mi">2010</span><span class="p">],</span>
+              <span class="s1">&#39;lat&#39;</span><span class="p">:[</span><span class="mf">47.627606</span><span class="p">],</span>
+              <span class="s1">&#39;long&#39;</span><span class="p">:[</span><span class="o">-</span><span class="mf">122.242054</span><span class="p">],</span>
+              <span class="s1">&#39;sqft_living15&#39;</span><span class="p">:[</span><span class="mi">5000</span><span class="p">],</span>
+              <span class="s1">&#39;sqft_lot15&#39;</span><span class="p">:[</span><span class="mi">40000</span><span class="p">]}</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="k">print</span> <span class="n">my_feature_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">graphlab</span><span class="o">.</span><span class="n">SFrame</span><span class="p">(</span><span class="n">bill_gates</span><span class="p">))</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>[13857515.149737407]
+</pre></div>
+
+
+<h2>Selection and summary statistics</h2>
+<div class="highlight"><pre><span></span><span class="n">sales</span><span class="p">[</span><span class="s1">&#39;zipcode&#39;</span><span class="p">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">dtype</span><span class="o">:</span> <span class="n">str</span>
+<span class="n">Rows</span><span class="o">:</span> <span class="mi">21613</span>
+<span class="o">[</span><span class="s1">&#39;98178&#39;</span><span class="o">,</span> <span class="s1">&#39;98125&#39;</span><span class="o">,</span> <span class="s1">&#39;98028&#39;</span><span class="o">,</span> <span class="s1">&#39;98136&#39;</span><span class="o">,</span> <span class="s1">&#39;98074&#39;</span><span class="o">,</span> <span class="s1">&#39;98053&#39;</span><span class="o">,</span> <span class="s1">&#39;98003&#39;</span><span class="o">,</span> <span class="s1">&#39;98198&#39;</span><span class="o">,</span> <span class="s1">&#39;98146&#39;</span><span class="o">,</span> <span class="s1">&#39;98038&#39;</span><span class="o">,</span> <span class="s1">&#39;98007&#39;</span><span class="o">,</span> <span class="s1">&#39;98115&#39;</span><span class="o">,</span> <span class="s1">&#39;98028&#39;</span><span class="o">,</span> <span class="s1">&#39;98074&#39;</span><span class="o">,</span> <span class="s1">&#39;98107&#39;</span><span class="o">,</span> <span class="s1">&#39;98126&#39;</span><span class="o">,</span> <span class="s1">&#39;98019&#39;</span><span class="o">,</span> <span class="s1">&#39;98103&#39;</span><span class="o">,</span> <span class="s1">&#39;98002&#39;</span><span class="o">,</span> <span class="s1">&#39;98003&#39;</span><span class="o">,</span> <span class="s1">&#39;98133&#39;</span><span class="o">,</span> <span class="s1">&#39;98040&#39;</span><span class="o">,</span> <span class="s1">&#39;98092&#39;</span><span class="o">,</span> <span class="s1">&#39;98030&#39;</span><span class="o">,</span> <span class="s1">&#39;98030&#39;</span><span class="o">,</span> <span class="s1">&#39;98002&#39;</span><span class="o">,</span> <span class="s1">&#39;98119&#39;</span><span class="o">,</span> <span class="s1">&#39;98112&#39;</span><span class="o">,</span> <span class="s1">&#39;98115&#39;</span><span class="o">,</span> <span class="s1">&#39;98052&#39;</span><span class="o">,</span> <span class="s1">&#39;98027&#39;</span><span class="o">,</span> <span class="s1">&#39;98133&#39;</span><span class="o">,</span> <span class="s1">&#39;98117&#39;</span><span class="o">,</span> <span class="s1">&#39;98117&#39;</span><span class="o">,</span> <span class="s1">&#39;98058&#39;</span><span class="o">,</span> <span class="s1">&#39;98115&#39;</span><span class="o">,</span> <span class="s1">&#39;98052&#39;</span><span class="o">,</span> <span class="s1">&#39;98107&#39;</span><span class="o">,</span> <span class="s1">&#39;98001&#39;</span><span class="o">,</span> <span class="s1">&#39;98056&#39;</span><span class="o">,</span> <span class="s1">&#39;98074&#39;</span><span class="o">,</span> <span class="s1">&#39;98166&#39;</span><span class="o">,</span> <span class="s1">&#39;98053&#39;</span><span class="o">,</span> <span class="s1">&#39;98119&#39;</span><span class="o">,</span> <span class="s1">&#39;98058&#39;</span><span class="o">,</span> <span class="s1">&#39;98019&#39;</span><span class="o">,</span> <span class="s1">&#39;98023&#39;</span><span class="o">,</span> <span class="s1">&#39;98007&#39;</span><span class="o">,</span> <span class="s1">&#39;98115&#39;</span><span class="o">,</span> <span class="s1">&#39;98070&#39;</span><span class="o">,</span> <span class="s1">&#39;98148&#39;</span><span class="o">,</span> <span class="s1">&#39;98056&#39;</span><span class="o">,</span> <span class="s1">&#39;98117&#39;</span><span class="o">,</span> <span class="s1">&#39;98117&#39;</span><span class="o">,</span> <span class="s1">&#39;98105&#39;</span><span class="o">,</span> <span class="s1">&#39;98105&#39;</span><span class="o">,</span> <span class="s1">&#39;98042&#39;</span><span class="o">,</span> <span class="s1">&#39;98042&#39;</span><span class="o">,</span> <span class="s1">&#39;98008&#39;</span><span class="o">,</span> <span class="s1">&#39;98059&#39;</span><span class="o">,</span> <span class="s1">&#39;98166&#39;</span><span class="o">,</span> <span class="s1">&#39;98148&#39;</span><span class="o">,</span> <span class="s1">&#39;98166&#39;</span><span class="o">,</span> <span class="s1">&#39;98115&#39;</span><span class="o">,</span> <span class="s1">&#39;98122&#39;</span><span class="o">,</span> <span class="s1">&#39;98144&#39;</span><span class="o">,</span> <span class="s1">&#39;98004&#39;</span><span class="o">,</span> <span class="s1">&#39;98001&#39;</span><span class="o">,</span> <span class="s1">&#39;98042&#39;</span><span class="o">,</span> <span class="s1">&#39;98004&#39;</span><span class="o">,</span> <span class="s1">&#39;98005&#39;</span><span class="o">,</span> <span class="s1">&#39;98034&#39;</span><span class="o">,</span> <span class="s1">&#39;98125&#39;</span><span class="o">,</span> <span class="s1">&#39;98038&#39;</span><span class="o">,</span> <span class="s1">&#39;98042&#39;</span><span class="o">,</span> <span class="s1">&#39;98075&#39;</span><span class="o">,</span> <span class="s1">&#39;98008&#39;</span><span class="o">,</span> <span class="s1">&#39;98116&#39;</span><span class="o">,</span> <span class="s1">&#39;98133&#39;</span><span class="o">,</span> <span class="s1">&#39;98010&#39;</span><span class="o">,</span> <span class="s1">&#39;98038&#39;</span><span class="o">,</span> <span class="s1">&#39;98038&#39;</span><span class="o">,</span> <span class="s1">&#39;98118&#39;</span><span class="o">,</span> <span class="s1">&#39;98059&#39;</span><span class="o">,</span> <span class="s1">&#39;98125&#39;</span><span class="o">,</span> <span class="s1">&#39;98119&#39;</span><span class="o">,</span> <span class="s1">&#39;98092&#39;</span><span class="o">,</span> <span class="s1">&#39;98056&#39;</span><span class="o">,</span> <span class="s1">&#39;98056&#39;</span><span class="o">,</span> <span class="s1">&#39;98136&#39;</span><span class="o">,</span> <span class="s1">&#39;98023&#39;</span><span class="o">,</span> <span class="s1">&#39;98199&#39;</span><span class="o">,</span> <span class="s1">&#39;98023&#39;</span><span class="o">,</span> <span class="s1">&#39;98117&#39;</span><span class="o">,</span> <span class="s1">&#39;98117&#39;</span><span class="o">,</span> <span class="s1">&#39;98040&#39;</span><span class="o">,</span> <span class="s1">&#39;98032&#39;</span><span class="o">,</span> <span class="s1">&#39;98023&#39;</span><span class="o">,</span> <span class="s1">&#39;98038&#39;</span><span class="o">,</span> <span class="s1">&#39;98045&#39;</span><span class="o">,</span> <span class="o">...</span> <span class="o">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">temp_zipcode</span> <span class="o">=</span> <span class="n">sales</span><span class="p">[</span><span class="n">sales</span><span class="p">[</span><span class="s1">&#39;zipcode&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;98039&#39;</span><span class="p">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">temp_zipcode</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>2160606.6000000006
+</pre></div>
+
+
+<h2>Filtering data using SFrame</h2>
+<div class="highlight"><pre><span></span><span class="n">num_houses</span> <span class="o">=</span> <span class="n">sales</span><span class="p">[(</span><span class="n">sales</span><span class="p">[</span><span class="s1">&#39;sqft_living&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">2000</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">sales</span><span class="p">[</span><span class="s1">&#39;sqft_living&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">4000</span><span class="p">)</span> <span class="p">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">total_houses</span> <span class="o">=</span> <span class="n">sales</span><span class="o">.</span><span class="n">num_rows</span><span class="p">()</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">required_houses</span> <span class="o">=</span> <span class="n">num_houses</span><span class="o">.</span><span class="n">num_rows</span><span class="p">()</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span> <span class="nb">float</span><span class="p">(</span><span class="n">required_houses</span><span class="p">)</span> <span class="o">/</span>  <span class="nb">float</span><span class="p">(</span><span class="n">total_houses</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>0.4215518437977143
+</pre></div>
+
+
+<h2>Building a regression model with several more features</h2>
+<div class="highlight"><pre><span></span><span class="n">advanced_features</span> <span class="o">=</span> <span class="p">[</span>
+<span class="s1">&#39;bedrooms&#39;</span><span class="p">,</span> <span class="s1">&#39;bathrooms&#39;</span><span class="p">,</span> <span class="s1">&#39;sqft_living&#39;</span><span class="p">,</span> <span class="s1">&#39;sqft_lot&#39;</span><span class="p">,</span> <span class="s1">&#39;floors&#39;</span><span class="p">,</span> <span class="s1">&#39;zipcode&#39;</span><span class="p">,</span>
+<span class="s1">&#39;condition&#39;</span><span class="p">,</span> <span class="c1"># condition of house</span>
+<span class="s1">&#39;grade&#39;</span><span class="p">,</span> <span class="c1"># measure of quality of construction</span>
+<span class="s1">&#39;waterfront&#39;</span><span class="p">,</span> <span class="c1"># waterfront property</span>
+<span class="s1">&#39;view&#39;</span><span class="p">,</span> <span class="c1"># type of view</span>
+<span class="s1">&#39;sqft_above&#39;</span><span class="p">,</span> <span class="c1"># square feet above ground</span>
+<span class="s1">&#39;sqft_basement&#39;</span><span class="p">,</span> <span class="c1"># square feet in basement</span>
+<span class="s1">&#39;yr_built&#39;</span><span class="p">,</span> <span class="c1"># the year built</span>
+<span class="s1">&#39;yr_renovated&#39;</span><span class="p">,</span> <span class="c1"># the year renovated</span>
+<span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;long&#39;</span><span class="p">,</span> <span class="c1"># the lat-long of the parcel</span>
+<span class="s1">&#39;sqft_living15&#39;</span><span class="p">,</span> <span class="c1"># average sq.ft. of 15 nearest neighbors</span>
+<span class="s1">&#39;sqft_lot15&#39;</span><span class="p">,</span> <span class="c1"># average lot size of 15 nearest neighbors </span>
+<span class="p">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">train_data</span><span class="p">,</span><span class="n">test_data</span> <span class="o">=</span> <span class="n">sales</span><span class="o">.</span><span class="n">random_split</span><span class="p">(</span><span class="o">.</span><span class="mi">8</span><span class="p">,</span><span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">my_features</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>[&#39;bedrooms&#39;, &#39;bathrooms&#39;, &#39;sqft_living&#39;, &#39;sqft_lot&#39;, &#39;floors&#39;, &#39;zipcode&#39;]
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">my_features_model</span> <span class="o">=</span> <span class="n">graphlab</span><span class="o">.</span><span class="n">linear_regression</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span><span class="n">target</span><span class="o">=</span><span class="s1">&#39;price&#39;</span><span class="p">,</span><span class="n">features</span><span class="o">=</span><span class="n">my_features</span><span class="p">,</span><span class="n">validation_set</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Linear</span> <span class="n">regression</span><span class="o">:</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">--------------------------------------------------------</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">examples</span>          <span class="o">:</span> <span class="mi">17384</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">features</span>          <span class="o">:</span> <span class="mi">6</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">unpacked</span> <span class="n">features</span> <span class="o">:</span> <span class="mi">6</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">coefficients</span>    <span class="o">:</span> <span class="mi">115</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Starting</span> <span class="n">Newton</span> <span class="n">Method</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">--------------------------------------------------------</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">+-----------+----------+--------------+--------------------+---------------+</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">|</span> <span class="n">Iteration</span> <span class="o">|</span> <span class="n">Passes</span>   <span class="o">|</span> <span class="n">Elapsed</span> <span class="n">Time</span> <span class="o">|</span> <span class="n">Training</span><span class="o">-</span><span class="n">max_error</span> <span class="o">|</span> <span class="n">Training</span><span class="o">-</span><span class="n">rmse</span> <span class="o">|</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">+-----------+----------+--------------+--------------------+---------------+</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">|</span> <span class="mi">1</span>         <span class="o">|</span> <span class="mi">2</span>        <span class="o">|</span> <span class="mf">0.034821</span>     <span class="o">|</span> <span class="mf">3763208.270524</span>     <span class="o">|</span> <span class="mf">181908.848367</span> <span class="o">|</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">+-----------+----------+--------------+--------------------+---------------+</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">SUCCESS</span><span class="o">:</span> <span class="n">Optimal</span> <span class="n">solution</span> <span class="n">found</span><span class="o">.</span>
+<span class="n">PROGRESS</span><span class="o">:</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="k">print</span> <span class="n">my_features_model</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">test_data</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>{&#39;max_error&#39;: 3486584.5093818563, &#39;rmse&#39;: 179542.4333126908}
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">my_advanced_model</span> <span class="o">=</span> <span class="n">graphlab</span><span class="o">.</span><span class="n">linear_regression</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span><span class="n">target</span><span class="o">=</span><span class="s1">&#39;price&#39;</span><span class="p">,</span><span class="n">features</span><span class="o">=</span><span class="n">advanced_features</span><span class="p">,</span><span class="n">validation_set</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Linear</span> <span class="n">regression</span><span class="o">:</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">--------------------------------------------------------</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">examples</span>          <span class="o">:</span> <span class="mi">17384</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">features</span>          <span class="o">:</span> <span class="mi">18</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">unpacked</span> <span class="n">features</span> <span class="o">:</span> <span class="mi">18</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">coefficients</span>    <span class="o">:</span> <span class="mi">127</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Starting</span> <span class="n">Newton</span> <span class="n">Method</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">--------------------------------------------------------</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">+-----------+----------+--------------+--------------------+---------------+</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">|</span> <span class="n">Iteration</span> <span class="o">|</span> <span class="n">Passes</span>   <span class="o">|</span> <span class="n">Elapsed</span> <span class="n">Time</span> <span class="o">|</span> <span class="n">Training</span><span class="o">-</span><span class="n">max_error</span> <span class="o">|</span> <span class="n">Training</span><span class="o">-</span><span class="n">rmse</span> <span class="o">|</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">+-----------+----------+--------------+--------------------+---------------+</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">|</span> <span class="mi">1</span>         <span class="o">|</span> <span class="mi">2</span>        <span class="o">|</span> <span class="mf">0.087034</span>     <span class="o">|</span> <span class="mf">3469012.450487</span>     <span class="o">|</span> <span class="mf">154580.940732</span> <span class="o">|</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">|</span> <span class="mi">2</span>         <span class="o">|</span> <span class="mi">3</span>        <span class="o">|</span> <span class="mf">0.145169</span>     <span class="o">|</span> <span class="mf">3469012.450673</span>     <span class="o">|</span> <span class="mf">154580.940735</span> <span class="o">|</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">+-----------+----------+--------------+--------------------+---------------+</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">SUCCESS</span><span class="o">:</span> <span class="n">Optimal</span> <span class="n">solution</span> <span class="n">found</span><span class="o">.</span>
+<span class="n">PROGRESS</span><span class="o">:</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="k">print</span> <span class="n">my_advanced_model</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">test_data</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>{&#39;max_error&#39;: 3556849.4138490623, &#39;rmse&#39;: 156831.11680200786}
+</pre></div>
+
+
+<p><br><br/>
+<em>Credits <a href="https://www.coursera.org/specializations/machine-learning">Machine Learning Foundations: A Case Study Approach</a></em></p>
+          </div>
+        </article>
+      </aside>
+    </div>
+
+    <div class="column is-one-quarter-desktop is-one-third-tablet is-hidden-print">
+      <aside class="menu">
+          <p class="menu-label">Links</p>
+          <ul class="menu-list">
+              <li><a href="http://getpelican.com/">
+                <span class="icon is-small"><i class="fa fa-globe fa-fw"></i></span>
+                <span class="link-text">Pelican</span>
+              </a></li>
+              <li><a href="http://python.org/">
+                <span class="icon is-small"><i class="fa fa-globe fa-fw"></i></span>
+                <span class="link-text">Python.org</span>
+              </a></li>
+              <li><a href="http://jinja.pocoo.org/">
+                <span class="icon is-small"><i class="fa fa-globe fa-fw"></i></span>
+                <span class="link-text">Jinja2</span>
+              </a></li>
+          </ul>
+<p class="menu-label">Social</p>
+<ul class="menu-list">
+    <li><a href="https://github.com/prashant47">
+      <span class="icon is-small">
+          <i class="fa fa-github fa-fw"></i>
+      </span>
+      <span class="link-text">GitHub</span>
+    </a></li>
+    <li><a href="http://facebook.com/prashantgonarkar">
+      <span class="icon is-small">
+          <i class="fa fa-facebook-official fa-fw"></i>
+      </span>
+      <span class="link-text">Facebook</span>
+    </a></li>
+    <li><a href="https://twitter.com/pgonarkar">
+      <span class="icon is-small">
+          <i class="fa fa-twitter fa-fw"></i>
+      </span>
+      <span class="link-text">Twitter</span>
+    </a></li>
+</ul>      </aside>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container has-text-centered">
+ <p class="subtitle">Can Machine Think ..</p>    <p><a href="https://github.com/textbook/bulrush">Bulrush</a> theme for
+        <a href="https://blog.getpelican.com/">Pelican</a>
+      | <span class="icon is-small"><i class="fa fa-html5"></i></span> HTML 5
+      | <span class="icon is-small"><i class="fa fa-css3"></i></span> CSS 3
+    </p>
+  </div>
+</footer>
+
+<script type="text/javascript">
+  document.getElementById('navToggle').addEventListener('click', function () {
+    var nav = document.getElementById('navMenu');
+    var className = nav.getAttribute('class');
+    if (className == 'nav-right nav-menu') {
+      nav.className = 'nav-right nav-menu is-active';
+    } else {
+      nav.className = 'nav-right nav-menu';
+    }
+  });
+</script>
+</body>
+</html>
