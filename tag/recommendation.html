@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns# article: http://ogp.me/ns/article#">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width">
+  <title>Heuristic Intelligence - recommendation</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.1/css/bulma.min.css">
+    <link rel="stylesheet" href="/theme/css/main.365169ea.css">
+    <link rel="stylesheet" href="/theme/webassets-external/d28acd117c09f64922b4b269837c8127_print.css" media="print">
+  <!--[if IE]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+
+<body id="index" class="home">
+<header class="hero is-primary">
+  <div class="hero-head">
+    <div class="container">
+      <nav class="nav">
+        <div class="nav-left">
+          <a class="nav-item is-brand title is-3"
+             href="/">Heuristic Intelligence</a>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<nav class="nav has-shadow is-hidden-print">
+  <div class="container">
+    <div class="nav-center"></div>
+    <span id="navToggle" class="nav-toggle">
+      <span></span>
+      <span></span>
+      <span></span>
+    </span>
+    <div id="navMenu" class="nav-right nav-menu">
+          <a class="nav-item is-tab "
+             href="/category/machine-learning.html">Machine Learning</a>
+          <a class="nav-item is-tab "
+             href="/category/graphlab.html">GraphLab</a>
+          <a class="nav-item is-tab "
+             href="/category/general.html">General</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="section columns">
+    <div class="column is-three-quarters-desktop is-two-thirds-tablet">
+      <aside id="featured" class="body">
+        <article>
+          <h1 class="title">
+            <a href="/2016/Mar/06/song_recommendation_system.html">Song Recommendation System</a>
+          </h1>
+<footer class="post-info">
+  <abbr class="published" title="2016-03-06T12:00:00+05:30">
+    Published <span class="is-info">Sun 06 March 2016</span>
+    in <a href="/category/graphlab.html">GraphLab</a>
+  </abbr>
+
+    <p class="author">
+      <em>by           <a class="url fn" href="/author/prashant-gonarkar.html">Prashant Gonarkar</a>
+</em>
+      <span class="tag is-small"><a href="/tag/python.html">python</a></span>
+      <span class="tag is-small"><a href="/tag/recommendation.html">recommendation</a></span>
+    </p>
+  
+</footer>          <div class="section">
+            <p>In this article we focused on building recommender systems to find products, music and movies that interest users. We have also built model which compared the simple popularity-based recommendation with a personalized model, and showed the significant improvement provided by personalization.</p>
+<p>In this Ipython Notebook we are going to explore the song data and the recommendations made by our model. In this process, we are going to learn how to use one of the most important data manipulation primitives groupby.</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">graphlab</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># CSV format datasets https://d396qusza40orc.cloudfront.net/phoenixassets/song_data.csv</span>
+<span class="n">song_data</span> <span class="o">=</span> <span class="n">graphlab</span><span class="o">.</span><span class="n">SFrame</span><span class="p">(</span><span class="s1">&#39;coursera-notebooks/course-1/song_data.gl&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>[INFO] This non-commercial license of GraphLab Create is assigned to prashantgonarkar@gmail.com and will expire on February 13, 2017. For commercial licensing options, visit https://dato.com/buy/.
+
+[INFO] Start server at: ipc:///tmp/graphlab_server-1181 - Server binary: /usr/local/lib/python2.7/dist-packages/graphlab/unity_server - Server log: /tmp/graphlab_server_1457246816.log
+[INFO] GraphLab Server Version: 1.8
+</pre></div>
+
+
+<h1>Exploring data</h1>
+<div class="highlight"><pre><span></span><span class="n">song_data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<div style="max-height:1000px;max-width:1500px;overflow:auto;"><table frame="box" rules="cols">
+    <tr>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">user_id</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">song_id</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">listen_count</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">title</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">artist</th>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b80344d063b5ccb3212f76538<br>f3d9e43d87dca9e ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">SOAKIMP12A8C130995</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">The Cove</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Jack Johnson</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b80344d063b5ccb3212f76538<br>f3d9e43d87dca9e ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">SOBBMDR12A8C13253B</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Entre Dos Aguas</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Paco De Lucia</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b80344d063b5ccb3212f76538<br>f3d9e43d87dca9e ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">SOBXHDL12A81C204C0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Stronger</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Kanye West</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b80344d063b5ccb3212f76538<br>f3d9e43d87dca9e ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">SOBYHAJ12A6701BF1D</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Constellations</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Jack Johnson</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b80344d063b5ccb3212f76538<br>f3d9e43d87dca9e ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">SODACBL12A8C13C273</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Learn To Fly</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Foo Fighters</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b80344d063b5ccb3212f76538<br>f3d9e43d87dca9e ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">SODDNQT12A6D4F5F7E</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">5</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Apuesta Por El Rock 'N'<br>Roll ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Héroes del Silencio</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b80344d063b5ccb3212f76538<br>f3d9e43d87dca9e ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">SODXRTY12AB0180F3B</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Paper Gangsta</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Lady GaGa</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b80344d063b5ccb3212f76538<br>f3d9e43d87dca9e ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">SOFGUAY12AB017B0A8</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Stacked Actors</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Foo Fighters</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b80344d063b5ccb3212f76538<br>f3d9e43d87dca9e ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">SOFRQTD12A81C233C0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Sehr kosmisch</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Harmonia</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b80344d063b5ccb3212f76538<br>f3d9e43d87dca9e ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">SOHQWYZ12A6D4FA701</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Heaven's gonna burn your<br>eyes ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Thievery Corporation<br>feat. Emiliana Torrini ...</td>
+    </tr>
+</table>
+<table frame="box" rules="cols">
+    <tr>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">song</th>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">The Cove - Jack Johnson</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Entre Dos Aguas - Paco De<br>Lucia ...</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Stronger - Kanye West</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Constellations - Jack<br>Johnson ...</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Learn To Fly - Foo<br>Fighters ...</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Apuesta Por El Rock 'N'<br>Roll - Héroes del ...</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Paper Gangsta - Lady GaGa</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Stacked Actors - Foo<br>Fighters ...</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Sehr kosmisch - Harmonia</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Heaven's gonna burn your<br>eyes - Thievery ...</td>
+    </tr>
+</table>
+[10 rows x 6 columns]<br/>
+</div>
+
+<div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">song_data</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>1116609
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">graphlab</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">set_target</span><span class="p">(</span><span class="s1">&#39;ipynb&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">song_data</span><span class="p">[</span><span class="s1">&#39;song&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+
+<h2>Count number  of users</h2>
+<div class="highlight"><pre><span></span><span class="n">users</span> <span class="o">=</span> <span class="n">song_data</span><span class="p">[</span><span class="s1">&#39;user_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">users</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>66346
+</pre></div>
+
+
+<h1>Create song recommender</h1>
+<div class="highlight"><pre><span></span><span class="n">train_data</span><span class="p">,</span><span class="n">test_data</span> <span class="o">=</span> <span class="n">song_data</span><span class="o">.</span><span class="n">random_split</span><span class="p">(</span><span class="o">.</span><span class="mi">8</span><span class="p">,</span><span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+
+
+<h1>Simple popularity-based recommender</h1>
+<div class="highlight"><pre><span></span><span class="n">popularity_model</span> <span class="o">=</span> <span class="n">graphlab</span><span class="o">.</span><span class="n">popularity_recommender</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span>
+                                                         <span class="n">user_id</span><span class="o">=</span><span class="s1">&#39;user_id&#39;</span><span class="p">,</span>
+                                                         <span class="n">item_id</span><span class="o">=</span><span class="s1">&#39;song&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Recsys</span> <span class="n">training</span><span class="o">:</span> <span class="n">model</span> <span class="o">=</span> <span class="n">popularity</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Warning</span><span class="o">:</span> <span class="n">Ignoring</span> <span class="n">columns</span> <span class="n">song_id</span><span class="o">,</span> <span class="n">listen_count</span><span class="o">,</span> <span class="n">title</span><span class="o">,</span> <span class="n">artist</span><span class="o">;</span>
+<span class="n">PROGRESS</span><span class="o">:</span>     <span class="n">To</span> <span class="n">use</span> <span class="n">one</span> <span class="n">of</span> <span class="n">these</span> <span class="k">as</span> <span class="n">a</span> <span class="n">target</span> <span class="n">column</span><span class="o">,</span> <span class="kd">set</span> <span class="n">target</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">column_name</span><span class="o">&gt;</span>
+<span class="n">PROGRESS</span><span class="o">:</span>     <span class="n">and</span> <span class="n">use</span> <span class="n">a</span> <span class="n">method</span> <span class="n">that</span> <span class="n">allows</span> <span class="n">the</span> <span class="n">use</span> <span class="n">of</span> <span class="n">a</span> <span class="n">target</span><span class="o">.</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Preparing</span> <span class="n">data</span> <span class="kd">set</span><span class="o">.</span>
+<span class="n">PROGRESS</span><span class="o">:</span>     <span class="n">Data</span> <span class="n">has</span> <span class="mi">893580</span> <span class="n">observations</span> <span class="k">with</span> <span class="mi">66085</span> <span class="n">users</span> <span class="n">and</span> <span class="mi">9952</span> <span class="n">items</span><span class="o">.</span>
+<span class="n">PROGRESS</span><span class="o">:</span>     <span class="n">Data</span> <span class="n">prepared</span> <span class="k">in</span><span class="o">:</span> <span class="mf">5.03742</span><span class="n">s</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="mi">893580</span> <span class="n">observations</span> <span class="n">to</span> <span class="n">process</span><span class="o">;</span> <span class="k">with</span> <span class="mi">9952</span> <span class="n">unique</span> <span class="n">items</span><span class="o">.</span>
+</pre></div>
+
+
+<h2>Use popularity model to make some predictions</h2>
+<div class="highlight"><pre><span></span><span class="n">popularity_model</span><span class="o">.</span><span class="n">recommend</span><span class="p">(</span><span class="n">users</span><span class="o">=</span><span class="p">[</span><span class="n">users</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+</pre></div>
+
+
+<div style="max-height:1000px;max-width:1500px;overflow:auto;"><table frame="box" rules="cols">
+    <tr>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">user_id</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">song</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">score</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">rank</th>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b048033af070b5dbb18d5d0e5<br>f334c9390611b04 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Sehr kosmisch - Harmonia</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">4754.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b048033af070b5dbb18d5d0e5<br>f334c9390611b04 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Undo - Björk</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">4227.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b048033af070b5dbb18d5d0e5<br>f334c9390611b04 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">You're The One - Dwight<br>Yoakam ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3781.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b048033af070b5dbb18d5d0e5<br>f334c9390611b04 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Revelry - Kings Of Leon</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3527.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">4</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b048033af070b5dbb18d5d0e5<br>f334c9390611b04 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Horn Concerto No. 4 in E<br>flat K495: II. Romance ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3161.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">5</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b048033af070b5dbb18d5d0e5<br>f334c9390611b04 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Secrets - OneRepublic</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3148.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">6</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b048033af070b5dbb18d5d0e5<br>f334c9390611b04 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Hey_ Soul Sister - Train</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2538.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">7</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b048033af070b5dbb18d5d0e5<br>f334c9390611b04 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Fireflies - Charttraxx<br>Karaoke ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2532.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">8</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b048033af070b5dbb18d5d0e5<br>f334c9390611b04 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Tive Sim - Cartola</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2521.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">9</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b048033af070b5dbb18d5d0e5<br>f334c9390611b04 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Drop The World - Lil<br>Wayne / Eminem ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2053.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">10</td>
+    </tr>
+</table>
+[10 rows x 4 columns]<br/>
+</div>
+
+<div class="highlight"><pre><span></span><span class="n">popularity_model</span><span class="o">.</span><span class="n">recommend</span><span class="p">(</span><span class="n">users</span><span class="o">=</span><span class="p">[</span><span class="n">users</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+</pre></div>
+
+
+<div style="max-height:1000px;max-width:1500px;overflow:auto;"><table frame="box" rules="cols">
+    <tr>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">user_id</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">song</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">score</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">rank</th>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">c66c10a9567f0d82ff31441a9<br>fd5063e5cd9dfe8 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Sehr kosmisch - Harmonia</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">4754.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">c66c10a9567f0d82ff31441a9<br>fd5063e5cd9dfe8 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Undo - Björk</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">4227.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">c66c10a9567f0d82ff31441a9<br>fd5063e5cd9dfe8 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">You're The One - Dwight<br>Yoakam ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3781.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">c66c10a9567f0d82ff31441a9<br>fd5063e5cd9dfe8 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Dog Days Are Over (Radio<br>Edit) - Florence + The ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3633.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">4</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">c66c10a9567f0d82ff31441a9<br>fd5063e5cd9dfe8 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Revelry - Kings Of Leon</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3527.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">5</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">c66c10a9567f0d82ff31441a9<br>fd5063e5cd9dfe8 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Horn Concerto No. 4 in E<br>flat K495: II. Romance ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3161.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">6</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">c66c10a9567f0d82ff31441a9<br>fd5063e5cd9dfe8 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Secrets - OneRepublic</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3148.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">7</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">c66c10a9567f0d82ff31441a9<br>fd5063e5cd9dfe8 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Fireflies - Charttraxx<br>Karaoke ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2532.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">8</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">c66c10a9567f0d82ff31441a9<br>fd5063e5cd9dfe8 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Tive Sim - Cartola</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2521.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">9</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">c66c10a9567f0d82ff31441a9<br>fd5063e5cd9dfe8 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Drop The World - Lil<br>Wayne / Eminem ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2053.0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">10</td>
+    </tr>
+</table>
+[10 rows x 4 columns]<br/>
+</div>
+
+<h1>Build a song recommender with personalization</h1>
+<div class="highlight"><pre><span></span><span class="n">personalized_model</span> <span class="o">=</span> <span class="n">graphlab</span><span class="o">.</span><span class="n">item_similarity_recommender</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span>
+                                                                <span class="n">user_id</span><span class="o">=</span><span class="s1">&#39;user_id&#39;</span><span class="p">,</span>
+                                                                <span class="n">item_id</span><span class="o">=</span><span class="s1">&#39;song&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Recsys</span> <span class="n">training</span><span class="o">:</span> <span class="n">model</span> <span class="o">=</span> <span class="n">item_similarity</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Warning</span><span class="o">:</span> <span class="n">Ignoring</span> <span class="n">columns</span> <span class="n">song_id</span><span class="o">,</span> <span class="n">listen_count</span><span class="o">,</span> <span class="n">title</span><span class="o">,</span> <span class="n">artist</span><span class="o">;</span>
+<span class="n">PROGRESS</span><span class="o">:</span>     <span class="n">To</span> <span class="n">use</span> <span class="n">one</span> <span class="n">of</span> <span class="n">these</span> <span class="k">as</span> <span class="n">a</span> <span class="n">target</span> <span class="n">column</span><span class="o">,</span> <span class="kd">set</span> <span class="n">target</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">column_name</span><span class="o">&gt;</span>
+<span class="n">PROGRESS</span><span class="o">:</span>     <span class="n">and</span> <span class="n">use</span> <span class="n">a</span> <span class="n">method</span> <span class="n">that</span> <span class="n">allows</span> <span class="n">the</span> <span class="n">use</span> <span class="n">of</span> <span class="n">a</span> <span class="n">target</span><span class="o">.</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Preparing</span> <span class="n">data</span> <span class="kd">set</span><span class="o">.</span>
+<span class="n">PROGRESS</span><span class="o">:</span>     <span class="n">Data</span> <span class="n">has</span> <span class="mi">893580</span> <span class="n">observations</span> <span class="k">with</span> <span class="mi">66085</span> <span class="n">users</span> <span class="n">and</span> <span class="mi">9952</span> <span class="n">items</span><span class="o">.</span>
+<span class="n">PROGRESS</span><span class="o">:</span>     <span class="n">Data</span> <span class="n">prepared</span> <span class="k">in</span><span class="o">:</span> <span class="mf">5.44737</span><span class="n">s</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Computing</span> <span class="n">item</span> <span class="n">similarity</span> <span class="n">statistics</span><span class="o">:</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Computing</span> <span class="n">most</span> <span class="n">similar</span> <span class="n">items</span> <span class="k">for</span> <span class="mi">9952</span> <span class="n">items</span><span class="o">:</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">+-----------------+-----------------+</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">|</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">items</span> <span class="o">|</span> <span class="n">Elapsed</span> <span class="n">Time</span>    <span class="o">|</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">+-----------------+-----------------+</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">|</span> <span class="mi">1000</span>            <span class="o">|</span> <span class="mf">2.97569</span>         <span class="o">|</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">|</span> <span class="mi">2000</span>            <span class="o">|</span> <span class="mf">3.29291</span>         <span class="o">|</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">|</span> <span class="mi">3000</span>            <span class="o">|</span> <span class="mf">3.59487</span>         <span class="o">|</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">|</span> <span class="mi">4000</span>            <span class="o">|</span> <span class="mf">3.84412</span>         <span class="o">|</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">|</span> <span class="mi">5000</span>            <span class="o">|</span> <span class="mf">4.10858</span>         <span class="o">|</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">|</span> <span class="mi">6000</span>            <span class="o">|</span> <span class="mf">4.37963</span>         <span class="o">|</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">|</span> <span class="mi">7000</span>            <span class="o">|</span> <span class="mf">4.6265</span>          <span class="o">|</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">|</span> <span class="mi">8000</span>            <span class="o">|</span> <span class="mf">4.87737</span>         <span class="o">|</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">|</span> <span class="mi">9000</span>            <span class="o">|</span> <span class="mf">5.09781</span>         <span class="o">|</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">+-----------------+-----------------+</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Finished</span> <span class="n">training</span> <span class="k">in</span> <span class="mf">7.55179</span><span class="n">s</span>
+</pre></div>
+
+
+<h3>Applying personalized model to make song recommendations</h3>
+<div class="highlight"><pre><span></span><span class="n">personalized_model</span><span class="o">.</span><span class="n">recommend</span><span class="p">(</span><span class="n">users</span><span class="o">=</span><span class="p">[</span><span class="n">users</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+</pre></div>
+
+
+<div style="max-height:1000px;max-width:1500px;overflow:auto;"><table frame="box" rules="cols">
+    <tr>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">user_id</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">song</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">score</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">rank</th>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b048033af070b5dbb18d5d0e5<br>f334c9390611b04 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Fantasy - The xx</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.037720015587</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b048033af070b5dbb18d5d0e5<br>f334c9390611b04 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Walk In The Park - Beach<br>House ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.02976011994</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b048033af070b5dbb18d5d0e5<br>f334c9390611b04 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Lover Of Mine - Beach<br>House ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.0273156899811</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b048033af070b5dbb18d5d0e5<br>f334c9390611b04 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Used To Be - Beach House</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.0258316352834</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">4</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b048033af070b5dbb18d5d0e5<br>f334c9390611b04 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Norway - Beach House</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.0219293953923</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">5</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b048033af070b5dbb18d5d0e5<br>f334c9390611b04 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Take Care - Beach House</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.021579303806</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">6</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b048033af070b5dbb18d5d0e5<br>f334c9390611b04 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Paper Gangsta - Lady GaGa</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.0204163968481</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">7</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b048033af070b5dbb18d5d0e5<br>f334c9390611b04 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Beautiful_ Dirty_ Rich -<br>Lady GaGa ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.0202445750201</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">8</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b048033af070b5dbb18d5d0e5<br>f334c9390611b04 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Real Love - Beach House</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.0195482216248</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">9</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b048033af070b5dbb18d5d0e5<br>f334c9390611b04 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Boys Boys Boys - Lady<br>GaGa ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.019074731889</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">10</td>
+    </tr>
+</table>
+[10 rows x 4 columns]<br/>
+</div>
+
+<div class="highlight"><pre><span></span><span class="n">personalized_model</span><span class="o">.</span><span class="n">recommend</span><span class="p">(</span><span class="n">users</span><span class="o">=</span><span class="p">[</span><span class="n">users</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+</pre></div>
+
+
+<div style="max-height:1000px;max-width:1500px;overflow:auto;"><table frame="box" rules="cols">
+    <tr>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">user_id</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">song</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">score</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">rank</th>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">c66c10a9567f0d82ff31441a9<br>fd5063e5cd9dfe8 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Cuando Pase El Temblor -<br>Soda Stereo ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.0194504525792</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">c66c10a9567f0d82ff31441a9<br>fd5063e5cd9dfe8 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Fireflies - Charttraxx<br>Karaoke ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.014473730789</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">c66c10a9567f0d82ff31441a9<br>fd5063e5cd9dfe8 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Love Is A Losing Game -<br>Amy Winehouse ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.0142865986808</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">c66c10a9567f0d82ff31441a9<br>fd5063e5cd9dfe8 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Marry Me - Train</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.0141334715267</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">4</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">c66c10a9567f0d82ff31441a9<br>fd5063e5cd9dfe8 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Secrets - OneRepublic</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.0135916683588</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">5</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">c66c10a9567f0d82ff31441a9<br>fd5063e5cd9dfe8 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">No Dejes Que... -<br>Caifanes ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.0134191754754</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">6</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">c66c10a9567f0d82ff31441a9<br>fd5063e5cd9dfe8 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Sehr kosmisch - Harmonia</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.0133987908186</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">7</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">c66c10a9567f0d82ff31441a9<br>fd5063e5cd9dfe8 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Y solo se me ocurre<br>amarte (Unplugged) - ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.0133210385369</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">8</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">c66c10a9567f0d82ff31441a9<br>fd5063e5cd9dfe8 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Te Hacen Falta Vitaminas<br>- Soda Stereo ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.0129302853556</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">9</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">c66c10a9567f0d82ff31441a9<br>fd5063e5cd9dfe8 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">OMG - Usher featuring<br>will.i.am ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.0127778293142</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">10</td>
+    </tr>
+</table>
+[10 rows x 4 columns]<br/>
+</div>
+
+<div class="highlight"><pre><span></span><span class="n">personalized_model</span><span class="o">.</span><span class="n">get_similar_items</span><span class="p">([</span><span class="s1">&#39;The Cove - Jack Johnson&#39;</span><span class="p">])</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Getting</span> <span class="n">similar</span> <span class="n">items</span> <span class="n">completed</span> <span class="k">in</span> <span class="mf">0.007283</span>
+</pre></div>
+
+
+<div style="max-height:1000px;max-width:1500px;overflow:auto;"><table frame="box" rules="cols">
+    <tr>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">song</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">similar</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">score</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">rank</th>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">The Cove - Jack Johnson</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Moonshine - Jack Johnson</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.179487179487</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">The Cove - Jack Johnson</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Holes To Heaven - Jack<br>Johnson ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.111969111969</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">The Cove - Jack Johnson</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Country Road - Jack<br>Johnson / Paula Fuga ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.0839694656489</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">The Cove - Jack Johnson</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Supposed To Be - Jack<br>Johnson ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.0740740740741</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">4</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">The Cove - Jack Johnson</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Let It Be Sung - Jack<br>Johnson / Matt Costa / ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.0736842105263</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">5</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">The Cove - Jack Johnson</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Wrong Turn - Jack Johnson</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.0709677419355</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">6</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">The Cove - Jack Johnson</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Questions - Jack Johnson</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.0687022900763</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">7</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">The Cove - Jack Johnson</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Rainbow - Jack Johnson /<br>G. Love ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.0649350649351</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">8</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">The Cove - Jack Johnson</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Posters - Jack Johnson</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.0593607305936</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">9</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">The Cove - Jack Johnson</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">If I Could - Jack Johnson</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.0588235294118</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">10</td>
+    </tr>
+</table>
+[10 rows x 4 columns]<br/>
+</div>
+
+<div class="highlight"><pre><span></span><span class="n">song_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>{&#39;artist&#39;: &#39;Jack Johnson&#39;,
+ &#39;listen_count&#39;: 1,
+ &#39;song&#39;: &#39;The Cove - Jack Johnson&#39;,
+ &#39;song_id&#39;: &#39;SOAKIMP12A8C130995&#39;,
+ &#39;title&#39;: &#39;The Cove&#39;,
+ &#39;user_id&#39;: &#39;b80344d063b5ccb3212f76538f3d9e43d87dca9e&#39;}
+</pre></div>
+
+
+<h1>Quantitative Comparison between the models</h1>
+<div class="highlight"><pre><span></span><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="n">model_performance</span> <span class="o">=</span> <span class="n">graphlab</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span><span class="n">test_data</span><span class="p">,</span> <span class="p">[</span><span class="n">popularity_model</span><span class="p">,</span> <span class="n">personalized_model</span><span class="p">],</span> <span class="n">user_sample</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">compare_models</span><span class="o">:</span> <span class="n">using</span> <span class="mi">2931</span> <span class="n">users</span> <span class="n">to</span> <span class="n">estimate</span> <span class="n">model</span> <span class="n">performance</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Evaluate</span> <span class="n">model</span> <span class="n">M0</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">recommendations</span> <span class="n">finished</span> <span class="n">on</span> <span class="mi">1000</span><span class="o">/</span><span class="mi">2931</span> <span class="n">queries</span><span class="o">.</span> <span class="n">users</span> <span class="n">per</span> <span class="n">second</span><span class="o">:</span> <span class="mf">1379.31</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">recommendations</span> <span class="n">finished</span> <span class="n">on</span> <span class="mi">2000</span><span class="o">/</span><span class="mi">2931</span> <span class="n">queries</span><span class="o">.</span> <span class="n">users</span> <span class="n">per</span> <span class="n">second</span><span class="o">:</span> <span class="mf">1413.19</span>
+
+<span class="n">Precision</span> <span class="n">and</span> <span class="n">recall</span> <span class="n">summary</span> <span class="n">statistics</span> <span class="n">by</span> <span class="n">cutoff</span>
+<span class="o">+--------+-----------------+------------------+</span>
+<span class="o">|</span> <span class="n">cutoff</span> <span class="o">|</span>  <span class="n">mean_precision</span> <span class="o">|</span>   <span class="n">mean_recall</span>    <span class="o">|</span>
+<span class="o">+--------+-----------------+------------------+</span>
+<span class="o">|</span>   <span class="mi">1</span>    <span class="o">|</span> <span class="mf">0.0276356192426</span> <span class="o">|</span> <span class="mf">0.00704457697805</span> <span class="o">|</span>
+<span class="o">|</span>   <span class="mi">2</span>    <span class="o">|</span> <span class="mf">0.0274650290003</span> <span class="o">|</span> <span class="mf">0.0148879287057</span>  <span class="o">|</span>
+<span class="o">|</span>   <span class="mi">3</span>    <span class="o">|</span> <span class="mf">0.0262708973047</span> <span class="o">|</span> <span class="mf">0.0220417769804</span>  <span class="o">|</span>
+<span class="o">|</span>   <span class="mi">4</span>    <span class="o">|</span> <span class="mf">0.0242238143978</span> <span class="o">|</span> <span class="mf">0.0261965554443</span>  <span class="o">|</span>
+<span class="o">|</span>   <span class="mi">5</span>    <span class="o">|</span> <span class="mf">0.0219037871034</span> <span class="o">|</span>  <span class="mf">0.029571775887</span>  <span class="o">|</span>
+<span class="o">|</span>   <span class="mi">6</span>    <span class="o">|</span> <span class="mf">0.0212669168657</span> <span class="o">|</span> <span class="mf">0.0336708194948</span>  <span class="o">|</span>
+<span class="o">|</span>   <span class="mi">7</span>    <span class="o">|</span> <span class="mf">0.0201783886533</span> <span class="o">|</span> <span class="mf">0.0374884100319</span>  <span class="o">|</span>
+<span class="o">|</span>   <span class="mi">8</span>    <span class="o">|</span> <span class="mf">0.0191487546912</span> <span class="o">|</span> <span class="mf">0.0406333667849</span>  <span class="o">|</span>
+<span class="o">|</span>   <span class="mi">9</span>    <span class="o">|</span> <span class="mf">0.0179309299064</span> <span class="o">|</span> <span class="mf">0.0425615155912</span>  <span class="o">|</span>
+<span class="o">|</span>   <span class="mi">10</span>   <span class="o">|</span> <span class="mf">0.0172296144661</span> <span class="o">|</span> <span class="mf">0.0452822737367</span>  <span class="o">|</span>
+<span class="o">+--------+-----------------+------------------+</span>
+<span class="o">[</span><span class="mi">10</span> <span class="n">rows</span> <span class="n">x</span> <span class="mi">3</span> <span class="n">columns</span><span class="o">]</span>
+
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Evaluate</span> <span class="n">model</span> <span class="n">M1</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">recommendations</span> <span class="n">finished</span> <span class="n">on</span> <span class="mi">1000</span><span class="o">/</span><span class="mi">2931</span> <span class="n">queries</span><span class="o">.</span> <span class="n">users</span> <span class="n">per</span> <span class="n">second</span><span class="o">:</span> <span class="mf">636.026</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">recommendations</span> <span class="n">finished</span> <span class="n">on</span> <span class="mi">2000</span><span class="o">/</span><span class="mi">2931</span> <span class="n">queries</span><span class="o">.</span> <span class="n">users</span> <span class="n">per</span> <span class="n">second</span><span class="o">:</span> <span class="mf">652.271</span>
+
+<span class="n">Precision</span> <span class="n">and</span> <span class="n">recall</span> <span class="n">summary</span> <span class="n">statistics</span> <span class="n">by</span> <span class="n">cutoff</span>
+<span class="o">+--------+-----------------+-----------------+</span>
+<span class="o">|</span> <span class="n">cutoff</span> <span class="o">|</span>  <span class="n">mean_precision</span> <span class="o">|</span>   <span class="n">mean_recall</span>   <span class="o">|</span>
+<span class="o">+--------+-----------------+-----------------+</span>
+<span class="o">|</span>   <span class="mi">1</span>    <span class="o">|</span>  <span class="mf">0.196178778574</span> <span class="o">|</span> <span class="mf">0.0624035480612</span> <span class="o">|</span>
+<span class="o">|</span>   <span class="mi">2</span>    <span class="o">|</span>  <span class="mf">0.165301944729</span> <span class="o">|</span> <span class="mf">0.0989251209952</span> <span class="o">|</span>
+<span class="o">|</span>   <span class="mi">3</span>    <span class="o">|</span>  <span class="mf">0.144433071762</span> <span class="o">|</span>  <span class="mf">0.126315233442</span> <span class="o">|</span>
+<span class="o">|</span>   <span class="mi">4</span>    <span class="o">|</span>  <span class="mf">0.128283862163</span> <span class="o">|</span>  <span class="mf">0.149273539588</span> <span class="o">|</span>
+<span class="o">|</span>   <span class="mi">5</span>    <span class="o">|</span>  <span class="mf">0.115114295462</span> <span class="o">|</span>  <span class="mf">0.165037712581</span> <span class="o">|</span>
+<span class="o">|</span>   <span class="mi">6</span>    <span class="o">|</span>  <span class="mf">0.105709086774</span> <span class="o">|</span>  <span class="mf">0.180392416447</span> <span class="o">|</span>
+<span class="o">|</span>   <span class="mi">7</span>    <span class="o">|</span> <span class="mf">0.0979675391139</span> <span class="o">|</span>  <span class="mf">0.193083833411</span> <span class="o">|</span>
+<span class="o">|</span>   <span class="mi">8</span>    <span class="o">|</span> <span class="mf">0.0907540088707</span> <span class="o">|</span>  <span class="mf">0.202181627936</span> <span class="o">|</span>
+<span class="o">|</span>   <span class="mi">9</span>    <span class="o">|</span> <span class="mf">0.0851813942909</span> <span class="o">|</span>  <span class="mf">0.212276173919</span> <span class="o">|</span>
+<span class="o">|</span>   <span class="mi">10</span>   <span class="o">|</span> <span class="mf">0.0802115319004</span> <span class="o">|</span>  <span class="mf">0.222459311226</span> <span class="o">|</span>
+<span class="o">+--------+-----------------+-----------------+</span>
+<span class="o">[</span><span class="mi">10</span> <span class="n">rows</span> <span class="n">x</span> <span class="mi">3</span> <span class="n">columns</span><span class="o">]</span>
+
+<span class="n">Model</span> <span class="n">compare</span> <span class="n">metric</span><span class="o">:</span> <span class="n">precision_recall</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">graphlab</span><span class="o">.</span><span class="n">show_comparison</span><span class="p">(</span><span class="n">model_performance</span><span class="p">,[</span><span class="n">popularity_model</span><span class="p">,</span> <span class="n">personalized_model</span><span class="p">])</span>
+</pre></div>
+
+
+<h2>Counting unique users</h2>
+<div class="highlight"><pre><span></span><span class="n">users_kanye_west</span> <span class="o">=</span> <span class="n">song_data</span><span class="p">[</span><span class="n">song_data</span><span class="p">[</span><span class="s1">&#39;artist&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Kanye West&#39;</span> <span class="p">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">users_kanye_west</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<div style="max-height:1000px;max-width:1500px;overflow:auto;"><table frame="box" rules="cols">
+    <tr>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">user_id</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">song_id</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">listen_count</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">title</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">artist</th>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b80344d063b5ccb3212f76538<br>f3d9e43d87dca9e ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">SOBXHDL12A81C204C0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Stronger</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Kanye West</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b80344d063b5ccb3212f76538<br>f3d9e43d87dca9e ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">SOMLMKI12A81C204BC</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Champion</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Kanye West</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">5d5e0142e54c3bb7b69f548c2<br>ee55066c90700eb ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">SORFASW12A81C22AE7</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Stronger</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Kanye West</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">537340ff896dea11328910013<br>cfe759413e1eeb3 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">SOBXHDL12A81C204C0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Stronger</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Kanye West</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">7dd192c8bd4f27f573cb15e86<br>56442aadd7a9c01 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">SOOLPFK12A58A7BDE3</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">5</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Flashing Lights</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Kanye West</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">8fce200f3912e9608e3b1463c<br>db9c3529aab5c08 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">SOBXHDL12A81C204C0</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Stronger</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Kanye West</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">8fce200f3912e9608e3b1463c<br>db9c3529aab5c08 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">SOIBSWV12A6D4F6AB3</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Through The Wire</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Kanye West</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">a56bf59af6edc5ae6c92d61dd<br>d214989332864e8 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">SONGNHO12AB0183915</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Bad News</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Kanye West</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">8fa25e588aeedaa539674babb<br>75729ac9f31f15e ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">SOOLPFK12A58A7BDE3</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Flashing Lights</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Kanye West</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">e8612acfb1572297ea0eaaa1f<br>27927d55fdcec65 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">SOIYWPZ12A81C204EF</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Homecoming</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Kanye West</td>
+    </tr>
+</table>
+<table frame="box" rules="cols">
+    <tr>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">song</th>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Stronger - Kanye West</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Champion - Kanye West</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Stronger - Kanye West</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Stronger - Kanye West</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Flashing Lights - Kanye<br>West ...</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Stronger - Kanye West</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Through The Wire - Kanye<br>West ...</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Bad News - Kanye West</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Flashing Lights - Kanye<br>West ...</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Homecoming - Kanye West</td>
+    </tr>
+</table>
+[10 rows x 6 columns]<br/>
+</div>
+
+<div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">users_kanye_west</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>3775
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">unique_users_kanye_west</span> <span class="o">=</span> <span class="n">users_kanye_west</span><span class="p">[</span><span class="s1">&#39;user_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">unique_users_kanye_west</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>2522
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">users_foo_fighters</span> <span class="o">=</span> <span class="n">song_data</span><span class="p">[</span><span class="n">song_data</span><span class="p">[</span><span class="s1">&#39;artist&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Foo Fighters&#39;</span> <span class="p">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">users_foo_fighters</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>3429
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">users_foo_fighters</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<div style="max-height:1000px;max-width:1500px;overflow:auto;"><table frame="box" rules="cols">
+    <tr>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">user_id</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">song_id</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">listen_count</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">title</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">artist</th>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b80344d063b5ccb3212f76538<br>f3d9e43d87dca9e ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">SODACBL12A8C13C273</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Learn To Fly</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Foo Fighters</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b80344d063b5ccb3212f76538<br>f3d9e43d87dca9e ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">SOFGUAY12AB017B0A8</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Stacked Actors</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Foo Fighters</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b80344d063b5ccb3212f76538<br>f3d9e43d87dca9e ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">SOMSQJY12A8C138539</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Breakout</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Foo Fighters</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b80344d063b5ccb3212f76538<br>f3d9e43d87dca9e ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">SOVHRGF12A8C13852F</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Generator</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Foo Fighters</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">12768858f6a825452e412deb1<br>df36d2d1d9c6791 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">SODACBL12A8C13C273</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">4</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Learn To Fly</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Foo Fighters</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">12768858f6a825452e412deb1<br>df36d2d1d9c6791 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">SOQLUTQ12A8AE48037</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">The Pretender</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Foo Fighters</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">f47116f998e030f2dab275b81<br>fb2a04a9dc06c33 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">SOLTAEJ12A8C13F793</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">6</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">What If I Do?</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Foo Fighters</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">5e161b9e14f303a0cef2d3f44<br>d07dd946549f89f ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">SOLJYEI12A8C13F7B3</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Friend Of A Friend</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Foo Fighters</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">e4c05157f8cebdf3b9d689c44<br>1ba97c5ed5db05b ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">SOFGUAY12AB017B0A8</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Stacked Actors</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Foo Fighters</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">e4c05157f8cebdf3b9d689c44<br>1ba97c5ed5db05b ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">SOFZVOT12A8C1408E9</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Skin And Bones</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Foo Fighters</td>
+    </tr>
+</table>
+<table frame="box" rules="cols">
+    <tr>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">song</th>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Learn To Fly - Foo<br>Fighters ...</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Stacked Actors - Foo<br>Fighters ...</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Breakout - Foo Fighters</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Generator - Foo Fighters</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Learn To Fly - Foo<br>Fighters ...</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">The Pretender - Foo<br>Fighters ...</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">What If I Do? - Foo<br>Fighters ...</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Friend Of A Friend - Foo<br>Fighters ...</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Stacked Actors - Foo<br>Fighters ...</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Skin And Bones - Foo<br>Fighters ...</td>
+    </tr>
+</table>
+[10 rows x 6 columns]<br/>
+</div>
+
+<div class="highlight"><pre><span></span><span class="n">unique_users_foo_fighters</span> <span class="o">=</span> <span class="n">users_foo_fighters</span><span class="p">[</span><span class="s1">&#39;user_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">unique_users_foo_fighters</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>2055
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">users_taylor_swift</span> <span class="o">=</span> <span class="n">song_data</span><span class="p">[</span><span class="n">song_data</span><span class="p">[</span><span class="s1">&#39;artist&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Taylor Swift&#39;</span> <span class="p">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">users_taylor_swift</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>6227
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">unique_users_taylor_swift</span> <span class="o">=</span> <span class="n">users_taylor_swift</span><span class="p">[</span><span class="s1">&#39;user_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">unique_users_taylor_swift</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>3246
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">users_lady_gaga</span> <span class="o">=</span> <span class="n">song_data</span><span class="p">[</span><span class="n">song_data</span><span class="p">[</span><span class="s1">&#39;artist&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Lady GaGa&#39;</span> <span class="p">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">users_lady_gaga</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>4129
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">unique_users_lady_gaga</span> <span class="o">=</span> <span class="n">users_lady_gaga</span><span class="p">[</span><span class="s1">&#39;user_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">unique_users_lady_gaga</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>2928
+</pre></div>
+
+
+<h2>Using groupby-aggregate to find the most popular and least popular artist</h2>
+<div class="highlight"><pre><span></span><span class="n">total_listen_count</span> <span class="o">=</span> <span class="n">song_data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">key_columns</span><span class="o">=</span><span class="s1">&#39;artist&#39;</span><span class="p">,</span> <span class="n">operations</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;total_count&#39;</span><span class="p">:</span> <span class="n">graphlab</span><span class="o">.</span><span class="n">aggregate</span><span class="o">.</span><span class="n">SUM</span><span class="p">(</span><span class="s1">&#39;listen_count&#39;</span><span class="p">)})</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">total_listen_count</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<div style="max-height:1000px;max-width:1500px;overflow:auto;"><table frame="box" rules="cols">
+    <tr>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">artist</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">total_count</th>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">The Dells</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">274</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Tag Team</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">314</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Danger Doom</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">561</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Rata Blanca</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">714</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">The Pogues</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">141</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Diana Ross</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">302</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Kurtis Blow</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">239</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Uniikki</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">429</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Make the Girl Dance</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">378</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Jorge Gonzalez</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">682</td>
+    </tr>
+</table>
+[10 rows x 2 columns]<br/>
+</div>
+
+<div class="highlight"><pre><span></span><span class="n">total_listen_count</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s1">&#39;total_count&#39;</span><span class="p">,</span><span class="n">ascending</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+
+
+<div style="max-height:1000px;max-width:1500px;overflow:auto;"><table frame="box" rules="cols">
+    <tr>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">artist</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">total_count</th>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Kings Of Leon</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">43218</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Dwight Yoakam</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">40619</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Björk</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">38889</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Coldplay</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">35362</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Florence + The Machine</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">33387</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Justin Bieber</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">29715</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Alliance Ethnik</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">26689</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">OneRepublic</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">25754</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Train</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">25402</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">The Black Keys</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">22184</td>
+    </tr>
+</table>
+[3375 rows x 2 columns]<br/>Note: Only the head of the SFrame is printed.<br/>You can use print_rows(num_rows=m, num_columns=n) to print more rows and columns.
+</div>
+
+<div class="highlight"><pre><span></span><span class="n">sorted_total_listen_count</span> <span class="o">=</span>  <span class="n">total_listen_count</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s1">&#39;total_count&#39;</span><span class="p">,</span><span class="n">ascending</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">sorted_total_listen_count</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<div style="max-height:1000px;max-width:1500px;overflow:auto;"><table frame="box" rules="cols">
+    <tr>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">artist</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">total_count</th>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Kings Of Leon</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">43218</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Dwight Yoakam</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">40619</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Björk</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">38889</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Coldplay</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">35362</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Florence + The Machine</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">33387</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Justin Bieber</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">29715</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Alliance Ethnik</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">26689</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">OneRepublic</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">25754</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Train</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">25402</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">The Black Keys</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">22184</td>
+    </tr>
+</table>
+[10 rows x 2 columns]<br/>
+</div>
+
+<div class="highlight"><pre><span></span><span class="n">sorted_total_listen_count</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>{&#39;artist&#39;: &#39;Kings Of Leon&#39;, &#39;total_count&#39;: 43218}
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">sorted_total_listen_count</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>{&#39;artist&#39;: &#39;William Tabbert&#39;, &#39;total_count&#39;: 14}
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">sorted_total_listen_count</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>{&#39;artist&#39;: &#39;Reel Feelings&#39;, &#39;total_count&#39;: 24}
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">sorted_total_listen_count</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>3375
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">sorted_total_listen_count</span><span class="p">[</span><span class="mi">3374</span><span class="p">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>{&#39;artist&#39;: &#39;William Tabbert&#39;, &#39;total_count&#39;: 14}
+</pre></div>
+
+
+<h2>Using groupby-aggregate to find the most recommended songs</h2>
+<div class="highlight"><pre><span></span><span class="n">train_data</span><span class="p">,</span><span class="n">test_data</span> <span class="o">=</span> <span class="n">song_data</span><span class="o">.</span><span class="n">random_split</span><span class="p">(</span><span class="o">.</span><span class="mi">8</span><span class="p">,</span><span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">personalized_model_problem</span> <span class="o">=</span> <span class="n">graphlab</span><span class="o">.</span><span class="n">item_similarity_recommender</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span>
+                                                                <span class="n">user_id</span><span class="o">=</span><span class="s1">&#39;user_id&#39;</span><span class="p">,</span>
+                                                                <span class="n">item_id</span><span class="o">=</span><span class="s1">&#39;song&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Recsys</span> <span class="n">training</span><span class="o">:</span> <span class="n">model</span> <span class="o">=</span> <span class="n">item_similarity</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Warning</span><span class="o">:</span> <span class="n">Ignoring</span> <span class="n">columns</span> <span class="n">song_id</span><span class="o">,</span> <span class="n">listen_count</span><span class="o">,</span> <span class="n">title</span><span class="o">,</span> <span class="n">artist</span><span class="o">;</span>
+<span class="n">PROGRESS</span><span class="o">:</span>     <span class="n">To</span> <span class="n">use</span> <span class="n">one</span> <span class="n">of</span> <span class="n">these</span> <span class="k">as</span> <span class="n">a</span> <span class="n">target</span> <span class="n">column</span><span class="o">,</span> <span class="kd">set</span> <span class="n">target</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">column_name</span><span class="o">&gt;</span>
+<span class="n">PROGRESS</span><span class="o">:</span>     <span class="n">and</span> <span class="n">use</span> <span class="n">a</span> <span class="n">method</span> <span class="n">that</span> <span class="n">allows</span> <span class="n">the</span> <span class="n">use</span> <span class="n">of</span> <span class="n">a</span> <span class="n">target</span><span class="o">.</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Preparing</span> <span class="n">data</span> <span class="kd">set</span><span class="o">.</span>
+<span class="n">PROGRESS</span><span class="o">:</span>     <span class="n">Data</span> <span class="n">has</span> <span class="mi">893580</span> <span class="n">observations</span> <span class="k">with</span> <span class="mi">66085</span> <span class="n">users</span> <span class="n">and</span> <span class="mi">9952</span> <span class="n">items</span><span class="o">.</span>
+<span class="n">PROGRESS</span><span class="o">:</span>     <span class="n">Data</span> <span class="n">prepared</span> <span class="k">in</span><span class="o">:</span> <span class="mf">2.44033</span><span class="n">s</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Computing</span> <span class="n">item</span> <span class="n">similarity</span> <span class="n">statistics</span><span class="o">:</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Computing</span> <span class="n">most</span> <span class="n">similar</span> <span class="n">items</span> <span class="k">for</span> <span class="mi">9952</span> <span class="n">items</span><span class="o">:</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">+-----------------+-----------------+</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">|</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">items</span> <span class="o">|</span> <span class="n">Elapsed</span> <span class="n">Time</span>    <span class="o">|</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">+-----------------+-----------------+</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">|</span> <span class="mi">1000</span>            <span class="o">|</span> <span class="mf">1.09591</span>         <span class="o">|</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">|</span> <span class="mi">2000</span>            <span class="o">|</span> <span class="mf">1.2529</span>          <span class="o">|</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">|</span> <span class="mi">3000</span>            <span class="o">|</span> <span class="mf">1.39995</span>         <span class="o">|</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">|</span> <span class="mi">4000</span>            <span class="o">|</span> <span class="mf">1.54215</span>         <span class="o">|</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">|</span> <span class="mi">5000</span>            <span class="o">|</span> <span class="mf">1.67863</span>         <span class="o">|</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">|</span> <span class="mi">6000</span>            <span class="o">|</span> <span class="mf">1.80773</span>         <span class="o">|</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">|</span> <span class="mi">7000</span>            <span class="o">|</span> <span class="mf">1.9314</span>          <span class="o">|</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">|</span> <span class="mi">8000</span>            <span class="o">|</span> <span class="mf">2.04903</span>         <span class="o">|</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">|</span> <span class="mi">9000</span>            <span class="o">|</span> <span class="mf">2.15834</span>         <span class="o">|</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="o">+-----------------+-----------------+</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">Finished</span> <span class="n">training</span> <span class="k">in</span> <span class="mf">2.50746</span><span class="n">s</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">subset_test_users</span> <span class="o">=</span> <span class="n">test_data</span><span class="p">[</span><span class="s1">&#39;user_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10000</span><span class="p">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">subset_test_users</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>10000
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">recommended_songs</span> <span class="o">=</span> <span class="n">personalized_model_problem</span><span class="o">.</span><span class="n">recommend</span><span class="p">(</span><span class="n">subset_test_users</span><span class="p">,</span><span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">PROGRESS</span><span class="o">:</span> <span class="n">recommendations</span> <span class="n">finished</span> <span class="n">on</span> <span class="mi">1000</span><span class="o">/</span><span class="mi">10000</span> <span class="n">queries</span><span class="o">.</span> <span class="n">users</span> <span class="n">per</span> <span class="n">second</span><span class="o">:</span> <span class="mf">723.767</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">recommendations</span> <span class="n">finished</span> <span class="n">on</span> <span class="mi">2000</span><span class="o">/</span><span class="mi">10000</span> <span class="n">queries</span><span class="o">.</span> <span class="n">users</span> <span class="n">per</span> <span class="n">second</span><span class="o">:</span> <span class="mf">729.502</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">recommendations</span> <span class="n">finished</span> <span class="n">on</span> <span class="mi">3000</span><span class="o">/</span><span class="mi">10000</span> <span class="n">queries</span><span class="o">.</span> <span class="n">users</span> <span class="n">per</span> <span class="n">second</span><span class="o">:</span> <span class="mf">730.974</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">recommendations</span> <span class="n">finished</span> <span class="n">on</span> <span class="mi">4000</span><span class="o">/</span><span class="mi">10000</span> <span class="n">queries</span><span class="o">.</span> <span class="n">users</span> <span class="n">per</span> <span class="n">second</span><span class="o">:</span> <span class="mf">732.245</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">recommendations</span> <span class="n">finished</span> <span class="n">on</span> <span class="mi">5000</span><span class="o">/</span><span class="mi">10000</span> <span class="n">queries</span><span class="o">.</span> <span class="n">users</span> <span class="n">per</span> <span class="n">second</span><span class="o">:</span> <span class="mf">730.881</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">recommendations</span> <span class="n">finished</span> <span class="n">on</span> <span class="mi">6000</span><span class="o">/</span><span class="mi">10000</span> <span class="n">queries</span><span class="o">.</span> <span class="n">users</span> <span class="n">per</span> <span class="n">second</span><span class="o">:</span> <span class="mf">729.537</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">recommendations</span> <span class="n">finished</span> <span class="n">on</span> <span class="mi">7000</span><span class="o">/</span><span class="mi">10000</span> <span class="n">queries</span><span class="o">.</span> <span class="n">users</span> <span class="n">per</span> <span class="n">second</span><span class="o">:</span> <span class="mf">729.793</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">recommendations</span> <span class="n">finished</span> <span class="n">on</span> <span class="mi">8000</span><span class="o">/</span><span class="mi">10000</span> <span class="n">queries</span><span class="o">.</span> <span class="n">users</span> <span class="n">per</span> <span class="n">second</span><span class="o">:</span> <span class="mf">731.585</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">recommendations</span> <span class="n">finished</span> <span class="n">on</span> <span class="mi">9000</span><span class="o">/</span><span class="mi">10000</span> <span class="n">queries</span><span class="o">.</span> <span class="n">users</span> <span class="n">per</span> <span class="n">second</span><span class="o">:</span> <span class="mf">731.684</span>
+<span class="n">PROGRESS</span><span class="o">:</span> <span class="n">recommendations</span> <span class="n">finished</span> <span class="n">on</span> <span class="mi">10000</span><span class="o">/</span><span class="mi">10000</span> <span class="n">queries</span><span class="o">.</span> <span class="n">users</span> <span class="n">per</span> <span class="n">second</span><span class="o">:</span> <span class="mf">732.331</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">recommended_songs</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<div style="max-height:1000px;max-width:1500px;overflow:auto;"><table frame="box" rules="cols">
+    <tr>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">user_id</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">song</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">score</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">rank</th>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b048033af070b5dbb18d5d0e5<br>f334c9390611b04 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Fantasy - The xx</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.037720015587</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">c66c10a9567f0d82ff31441a9<br>fd5063e5cd9dfe8 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Cuando Pase El Temblor -<br>Soda Stereo ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.0194504525792</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">ed04954d5b6001c7945c6ac71<br>686c3bd4ecdacb3 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Coming Your Way - Iration</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.031314214241</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">b1e6e9563da324641e644c769<br>b7edf202186de47 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Pimpa's Paradise - Damian<br>Marley / Stephen Marl ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.0694444444444</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">02f015d32ac2cd1e52d26e3ec<br>36048711dd5711b ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Where The Boat Leaves<br>From (Album) - Zac Brown ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.063530766032</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">91b986eeb5d81eec60dc4b136<br>f04c0cfd662d658 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Jezebel - Sade</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.0588785769489</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">f933855d675606737fdc191e9<br>edff7625d08aae8 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Schießt die Deutschen<br>raus - Mario Lang ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.0357374917866</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">4867d5516a280db13695b9b9c<br>7ce6b574f34c6b4 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Two Steps_ Twice - Foals</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.0104654895666</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">968f1baebc490d3c6999ee6c8<br>5c5cab8b726b347 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Me_ Myself And I -<br>Beyoncé ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.0183084820675</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">c067c22072a17d33310d7223d<br>7b79f819e48cf42 ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Grind With Me (Explicit<br>Version) - Pretty Ricky ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">0.0459424433009</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+    </tr>
+</table>
+[10 rows x 4 columns]<br/>
+</div>
+
+<div class="highlight"><pre><span></span><span class="n">song_recommended_count</span> <span class="o">=</span>  <span class="n">recommended_songs</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">key_columns</span><span class="o">=</span><span class="s1">&#39;song&#39;</span><span class="p">,</span> <span class="n">operations</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="n">graphlab</span><span class="o">.</span><span class="n">aggregate</span><span class="o">.</span><span class="n">COUNT</span><span class="p">()})</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">song_recommended_count</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<div style="max-height:1000px;max-width:1500px;overflow:auto;"><table frame="box" rules="cols">
+    <tr>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">song</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">count</th>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Wrong Turn - Jack Johnson</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">9</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Welcome Home (Sanitarium)<br>- Metallica ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">4</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Wake Up Call - Maroon 5</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">2</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">The Pyramids - Tim Wilson</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">U.R.A Fever - The Kills</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Slow Down - Alicia Keys</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">If This Is Love - The<br>Saturdays ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Marshall Mathers - Eminem</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Electricity - Moby</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">1</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Hoodoo - Muse</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">3</td>
+    </tr>
+</table>
+[10 rows x 2 columns]<br/>
+</div>
+
+<div class="highlight"><pre><span></span><span class="n">song_recommended_count</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>{&#39;count&#39;: 2, &#39;song&#39;: &#39;Amame - Juanes&#39;}
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">sorted_song_recommended_count</span> <span class="o">=</span> <span class="n">song_recommended_count</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s1">&#39;count&#39;</span><span class="p">,</span><span class="n">ascending</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">sorted_song_recommended_count</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<div style="max-height:1000px;max-width:1500px;overflow:auto;"><table frame="box" rules="cols">
+    <tr>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">song</th>
+        <th style="padding-left: 1em; padding-right: 1em; text-align: center">count</th>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Undo - Björk</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">447</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Secrets - OneRepublic</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">373</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Revelry - Kings Of Leon</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">228</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">You're The One - Dwight<br>Yoakam ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">179</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Fireflies - Charttraxx<br>Karaoke ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">124</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Hey_ Soul Sister - Train</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">117</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Horn Concerto No. 4 in E<br>flat K495: II. Romance ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">95</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">OMG - Usher featuring<br>will.i.am ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">68</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Sehr kosmisch - Harmonia</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">66</td>
+    </tr>
+    <tr>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">Dog Days Are Over (Radio<br>Edit) - Florence + The ...</td>
+        <td style="padding-left: 1em; padding-right: 1em; text-align: center; vertical-align: top">52</td>
+    </tr>
+</table>
+[10 rows x 2 columns]<br/>
+</div>
+
+<p><br><br/>
+<em>Credits <a href="https://www.coursera.org/specializations/machine-learning">Machine Learning Foundations: A Case Study Approach</a></em></p>
+          </div>
+        </article>
+      </aside>
+    </div>
+
+    <div class="column is-one-quarter-desktop is-one-third-tablet is-hidden-print">
+      <aside class="menu">
+          <p class="menu-label">Links</p>
+          <ul class="menu-list">
+              <li><a href="http://getpelican.com/">
+                <span class="icon is-small"><i class="fa fa-globe fa-fw"></i></span>
+                <span class="link-text">Pelican</span>
+              </a></li>
+              <li><a href="http://python.org/">
+                <span class="icon is-small"><i class="fa fa-globe fa-fw"></i></span>
+                <span class="link-text">Python.org</span>
+              </a></li>
+              <li><a href="http://jinja.pocoo.org/">
+                <span class="icon is-small"><i class="fa fa-globe fa-fw"></i></span>
+                <span class="link-text">Jinja2</span>
+              </a></li>
+          </ul>
+<p class="menu-label">Social</p>
+<ul class="menu-list">
+    <li><a href="https://github.com/prashant47">
+      <span class="icon is-small">
+          <i class="fa fa-github fa-fw"></i>
+      </span>
+      <span class="link-text">GitHub</span>
+    </a></li>
+    <li><a href="http://facebook.com/prashantgonarkar">
+      <span class="icon is-small">
+          <i class="fa fa-facebook-official fa-fw"></i>
+      </span>
+      <span class="link-text">Facebook</span>
+    </a></li>
+    <li><a href="https://twitter.com/pgonarkar">
+      <span class="icon is-small">
+          <i class="fa fa-twitter fa-fw"></i>
+      </span>
+      <span class="link-text">Twitter</span>
+    </a></li>
+</ul>      </aside>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container has-text-centered">
+ <p class="subtitle">Can Machine Think ..</p>    <p><a href="https://github.com/textbook/bulrush">Bulrush</a> theme for
+        <a href="https://blog.getpelican.com/">Pelican</a>
+      | <span class="icon is-small"><i class="fa fa-html5"></i></span> HTML 5
+      | <span class="icon is-small"><i class="fa fa-css3"></i></span> CSS 3
+    </p>
+  </div>
+</footer>
+
+<script type="text/javascript">
+  document.getElementById('navToggle').addEventListener('click', function () {
+    var nav = document.getElementById('navMenu');
+    var className = nav.getAttribute('class');
+    if (className == 'nav-right nav-menu') {
+      nav.className = 'nav-right nav-menu is-active';
+    } else {
+      nav.className = 'nav-right nav-menu';
+    }
+  });
+</script>
+</body>
+</html>
