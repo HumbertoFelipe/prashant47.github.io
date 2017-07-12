@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns# article: http://ogp.me/ns/article#">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width">
+  <title>Probablity Distributions</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.1/css/bulma.min.css">
+    <link rel="stylesheet" href="/theme/css/main.365169ea.css">
+    <link rel="stylesheet" href="/theme/webassets-external/d28acd117c09f64922b4b269837c8127_print.css" media="print">
+  <!--[if IE]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+<meta property="og:title" content="Heuristic Intelligence - Probablity Distributions">
+  <meta property="og:description" content="Probablity Distributions from programmer's perspective">
+<meta property="og:url" content="/2017/Jul/09/probablity_distributions.html">
+    <meta property="og:image" content="/images/output_16_2.png">
+    <meta name="twitter:image:alt" content="Heuristic Intelligence | The question of whether a computer can think is no more interesting than the question of whether a submarine can swim.― Edsger W. Dijkstra">
+<meta name="twitter:card" content="summary">
+<meta property="og:site_name" content="Heuristic Intelligence">
+<meta property="og:type" content="article">
+  <meta property="article:published_time" content="2017-07-09T12:00:00+05:30">
+    <meta property="article:tag" content="python">
+    <meta property="article:tag" content="probablity">
+    <meta property="article:tag" content="pandas">
+  <meta property="article:section" content="Statistics">
+</head>
+
+<body id="index" class="home">
+<header class="hero is-primary">
+  <div class="hero-head">
+    <div class="container">
+      <nav class="nav">
+        <div class="nav-left">
+          <a class="nav-item is-brand title is-3"
+             href="/">Heuristic Intelligence</a>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<nav class="nav has-shadow is-hidden-print">
+  <div class="container">
+    <div class="nav-center"></div>
+    <span id="navToggle" class="nav-toggle">
+      <span></span>
+      <span></span>
+      <span></span>
+    </span>
+    <div id="navMenu" class="nav-right nav-menu">
+          <a class="nav-item is-tab "
+             href="/category/graphlab.html">GraphLab</a>
+          <a class="nav-item is-tab "
+             href="/category/machine-learning.html">Machine Learning</a>
+          <a class="nav-item is-tab "
+             href="/category/misc.html">Misc</a>
+          <a class="nav-item is-tab is-active"
+             href="/category/statistics.html">Statistics</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="section columns">
+    <div class="column is-three-quarters-desktop is-two-thirds-tablet">
+<section id="content" class="body">
+  <article>
+    <h1 class="title">
+      <a href="/2017/Jul/09/probablity_distributions.html" rel="bookmark"
+         title="Permalink to Probablity Distributions">Probablity Distributions</a></h1>
+<footer class="post-info">
+  <abbr class="published" title="2017-07-09T12:00:00+05:30">
+    Published <span class="is-info">Sun 09 July 2017</span>
+    in <a href="/category/statistics.html">Statistics</a>
+  </abbr>
+
+    <p class="author">
+      <em>by           Prashant Gonarkar
+</em>
+      <span class="tag is-small"><a href="/tag/python.html">python</a></span>
+      <span class="tag is-small"><a href="/tag/probablity.html">probablity</a></span>
+      <span class="tag is-small"><a href="/tag/pandas.html">pandas</a></span>
+    </p>
+  
+</footer>    <div class="section"><h1>Probablity Distributions in Pandas</h1>
+<div class="highlight"><pre><span></span><span class="c1"># import pandas and numpy</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># numpy has some built-in distributions</span>
+<span class="c1"># Let&#39;s do trial one time &amp; see the output</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mf">0.5</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>1
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># now let&#39;s do it 1000 times and find the average</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span><span class="mf">0.5</span><span class="p">)</span><span class="o">/</span><span class="mi">1000</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>0.493
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># let&#39;s find our probablity of occuring tornado two days in a row using binomial distribution</span>
+<span class="n">chance_of_tornado</span> <span class="o">=</span> <span class="mf">0.01</span> <span class="c1"># probablity of tornado on any day</span>
+
+<span class="n">tornado_events</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">chance_of_tornado</span><span class="p">,</span> <span class="mi">1000000</span><span class="p">)</span> <span class="c1"># trail size is set 10000000</span>
+
+<span class="c1"># find consecutative two ones in return list tornado_events</span>
+<span class="n">two_days_in_a_row</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">tornado_events</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">tornado_events</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">==</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">tornado_events</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">two_days_in_a_row</span><span class="o">+=</span><span class="mi">1</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;{} tornadoes back to back in {} years&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">two_days_in_a_row</span><span class="p">,</span> <span class="mi">1000000</span><span class="o">/</span><span class="mi">365</span><span class="p">))</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>102 tornadoes back to back in 2739.72602739726 years
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># uniform distribution </span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>0.2962707472170836
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># uniform distribution with lower upper bound </span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">.</span><span class="mi">75</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>0.14042166159994887
+</pre></div>
+
+
+<p>Formula for standard deviation
+$$\sqrt{\frac{1}{N} \sum_{i=1}^N (x_i - \overline{x})^2}$$</p>
+<div class="highlight"><pre><span></span><span class="c1"># normal distribution</span>
+<span class="n">distribution</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mf">0.75</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+
+<span class="c1"># calculating standard distribution from formula</span>
+<span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">distribution</span><span class="p">)</span><span class="o">-</span><span class="n">distribution</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">distribution</span><span class="p">))</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>0.96359223265251603
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># calculating with inbuilt function</span>
+<span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">distribution</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>0.96359223265251603
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="kn">as</span> <span class="nn">stats</span>
+<span class="n">stats</span><span class="o">.</span><span class="n">kurtosis</span><span class="p">(</span><span class="n">distribution</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>0.0886272943714217
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># finding skew of distribution </span>
+<span class="n">stats</span><span class="o">.</span><span class="n">skew</span><span class="p">(</span><span class="n">distribution</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>-0.12279299911663993
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># let&#39;s see how skew varies in case of chi squared distribution if degree of freedom is changed</span>
+<span class="c1"># skew for degree of freedom 2</span>
+<span class="n">chi_squared_df2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">chisquare</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+<span class="n">stats</span><span class="o">.</span><span class="n">skew</span><span class="p">(</span><span class="n">chi_squared_df2</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>2.110549699727957
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># skew for degree of freedom 5</span>
+<span class="n">chi_squared_df5</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">chisquare</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+<span class="n">stats</span><span class="o">.</span><span class="n">skew</span><span class="p">(</span><span class="n">chi_squared_df5</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>1.1764301229675125
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+
+<span class="n">output</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">([</span><span class="n">chi_squared_df2</span><span class="p">,</span><span class="n">chi_squared_df5</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s1">&#39;step&#39;</span><span class="p">,</span> 
+                  <span class="n">label</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2 degrees of freedom&#39;</span><span class="p">,</span><span class="s1">&#39;5 degrees of freedom&#39;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper right&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p><img alt="graphplot" src="/images/output_16_2.png"></p>
+<p><br><br/>
+<em>Credits <a href="https://www.coursera.org/learn/python-data-analysis">Introduction to Data Science in Python</a></em></p></div>
+
+  </article>
+</section>
+
+<script type="application/ld+json">
+  {"datePublished": "2017-07-09T12:00:00+05:30", "articleSection": "Statistics", "@type": "BlogPosting", "headline": "Probablity Distributions", "@context": "http://schema.org", "image": {"url": "/images/output_16_2.png", "@type": "ImageObject"}, "description": "Probablity Distributions from programmer's perspective", "author": {"name": "Prashant Gonarkar", "@type": "Person"}, "mainEntityOfPage": {"@id": "/2017/Jul/09/probablity_distributions.html", "@type": "WebPage"}}
+</script>
+    </div>
+
+    <div class="column is-one-quarter-desktop is-one-third-tablet is-hidden-print">
+      <aside class="menu">
+          <p class="menu-label">Links</p>
+          <ul class="menu-list">
+              <li><a href="https://dataskeptic.com/podcast">
+                <span class="icon is-small"><i class="fa fa-globe fa-fw"></i></span>
+                <span class="link-text">Data Skeptic</span>
+              </a></li>
+              <li><a href="http://planetpython.org/">
+                <span class="icon is-small"><i class="fa fa-globe fa-fw"></i></span>
+                <span class="link-text">Python Planet</span>
+              </a></li>
+              <li><a href="https://news.ycombinator.com/">
+                <span class="icon is-small"><i class="fa fa-globe fa-fw"></i></span>
+                <span class="link-text">Hacker News</span>
+              </a></li>
+          </ul>
+<p class="menu-label">Social</p>
+<ul class="menu-list">
+    <li><a href="https://github.com/prashant47">
+      <span class="icon is-small">
+          <i class="fa fa-github fa-fw"></i>
+      </span>
+      <span class="link-text">GitHub</span>
+    </a></li>
+    <li><a href="http://facebook.com/prashantgonarkar">
+      <span class="icon is-small">
+          <i class="fa fa-facebook-official fa-fw"></i>
+      </span>
+      <span class="link-text">Facebook</span>
+    </a></li>
+    <li><a href="https://twitter.com/pgonarkar">
+      <span class="icon is-small">
+          <i class="fa fa-twitter fa-fw"></i>
+      </span>
+      <span class="link-text">Twitter</span>
+    </a></li>
+</ul>      </aside>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container has-text-centered">
+ <p class="subtitle">The question of whether a computer can think is no more interesting than the question of whether a submarine can swim.― Edsger W. Dijkstra</p>    <p><a href="https://github.com/textbook/bulrush">Bulrush</a> theme for
+        <a href="https://blog.getpelican.com/">Pelican</a>
+      | <span class="icon is-small"><i class="fa fa-html5"></i></span> HTML 5
+      | <span class="icon is-small"><i class="fa fa-css3"></i></span> CSS 3
+    </p>
+  </div>
+</footer>
+
+<script type="text/javascript">
+  document.getElementById('navToggle').addEventListener('click', function () {
+    var nav = document.getElementById('navMenu');
+    var className = nav.getAttribute('class');
+    if (className == 'nav-right nav-menu') {
+      nav.className = 'nav-right nav-menu is-active';
+    } else {
+      nav.className = 'nav-right nav-menu';
+    }
+  });
+</script>
+</body>
+</html>
