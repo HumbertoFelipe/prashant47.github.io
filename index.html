@@ -37,11 +37,13 @@
     </span>
     <div id="navMenu" class="nav-right nav-menu">
           <a class="nav-item is-tab "
-             href="/category/machine-learning.html">Machine Learning</a>
-          <a class="nav-item is-tab "
              href="/category/graphlab.html">GraphLab</a>
           <a class="nav-item is-tab "
-             href="/category/general.html">General</a>
+             href="/category/machine-learning.html">Machine Learning</a>
+          <a class="nav-item is-tab "
+             href="/category/misc.html">Misc</a>
+          <a class="nav-item is-tab "
+             href="/category/statistics.html">Statistics</a>
     </div>
   </div>
 </nav>
@@ -52,27 +54,3440 @@
       <aside id="featured" class="body">
         <article>
           <h1 class="title">
-            <a href="/2017/Jul/03/welcome.html">Welcome</a>
+            <a href="/2017/Jul/12/introduction_to_pandas_toolkit.html">Introduction to Pandas Toolkit</a>
           </h1>
 <footer class="post-info">
-  <abbr class="published" title="2017-07-03T10:20:00+05:30">
-    Published <span class="is-info">Mon 03 July 2017</span>
-    in <a href="/category/general.html">General</a>
+  <abbr class="published" title="2017-07-12T12:00:00+05:30">
+    Published <span class="is-info">Wed 12 July 2017</span>
+    in <a href="/category/machine-learning.html">Machine Learning</a>
   </abbr>
 
     <p class="author">
-      <em>by           <a class="url fn" href="/author/prashant-gonarkar.html">Prashant Gonarkar</a>
+      <em>by           Prashant Gonarkar
 </em>
+      <span class="tag is-small"><a href="/tag/python.html">python</a></span>
+      <span class="tag is-small"><a href="/tag/pandas.html">pandas</a></span>
     </p>
   
 </footer>          <div class="section">
-            <p>This is blog contains tutorials, notes on Machine Learning and Data Science.</p>
+            <p>In this module we will learn the fundamentals of one of the most important toolkits Python has for data cleaning and processing i.e pandas. <a href="http://pandas.pydata.org">pandas</a> is an open source, BSD-licensed library providing high-performance, easy-to-use data structures and data analysis tools for the Python programming language.
+We will learn how to read in data into DataFrame structures, how to query these structures, and the details about such structures are indexed.</p>
+<h1>Introduction to Series Data Structure</h1>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># read the documentation of Series </span>
+<span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="err">?</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">animals</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Tiger&#39;</span><span class="p">,</span> <span class="s1">&#39;Bear&#39;</span><span class="p">,</span><span class="s1">&#39;Mouse&#39;</span><span class="p">]</span>
+<span class="c1"># passing list to series </span>
+<span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">animals</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>0    Tiger
+1     Bear
+2    Mouse
+dtype: object
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># passing numbers to see what dtype panda sets</span>
+<span class="n">numbers</span> <span class="o">=</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">]</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">numbers</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>0    6
+1    7
+2    8
+dtype: int64
+</pre></div>
+
+
+<h2>Let's see how pandas handle missing data type</h2>
+<div class="highlight"><pre><span></span><span class="n">animals</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Tiger&#39;</span><span class="p">,</span> <span class="s1">&#39;Bear&#39;</span><span class="p">,</span> <span class="bp">None</span> <span class="p">]</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">animals</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>0    Tiger
+1     Bear
+2     None
+dtype: object
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">numbers</span> <span class="o">=</span> <span class="p">[</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="bp">None</span> <span class="p">]</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">numbers</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>0    5.0
+1    6.0
+2    NaN
+dtype: float64
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># compare NaN with None</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="o">==</span> <span class="bp">None</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>False
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># even when you compare nan to other nan</span>
+<span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>False
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># you need to use special function to check nan</span>
+<span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>True
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># creating series with dict given </span>
+<span class="n">sports</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Hockey&#39;</span><span class="p">:</span> <span class="s1">&#39;India&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;Golf&#39;</span><span class="p">:</span> <span class="s1">&#39;Scotland&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;Sumo&#39;</span><span class="p">:</span> <span class="s1">&#39;Japan&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;Taekwondo&#39;</span><span class="p">:</span> <span class="s1">&#39;South Korea&#39;</span><span class="p">}</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">sports</span><span class="p">)</span>
+<span class="n">s</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>Golf            Scotland
+Hockey             India
+Sumo               Japan
+Taekwondo    South Korea
+dtype: object
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># printing indexs of series</span>
+<span class="n">s</span><span class="o">.</span><span class="n">index</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>Index([&#39;Golf&#39;, &#39;Hockey&#39;, &#39;Sumo&#39;, &#39;Taekwondo&#39;], dtype=&#39;object&#39;)
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># providing inline values to series</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="s1">&#39;Tiger&#39;</span><span class="p">,</span> <span class="s1">&#39;Bear&#39;</span><span class="p">,</span> <span class="s1">&#39;Moose&#39;</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;India&#39;</span><span class="p">,</span> <span class="s1">&#39;America&#39;</span><span class="p">,</span> <span class="s1">&#39;Canada&#39;</span><span class="p">])</span>
+<span class="n">s</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>India      Tiger
+America     Bear
+Canada     Moose
+dtype: object
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># if index values not provided then exiting are overiden and missing ones are set NaN</span>
+<span class="n">sports</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Archery&#39;</span><span class="p">:</span> <span class="s1">&#39;Bhutan&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;Golf&#39;</span><span class="p">:</span> <span class="s1">&#39;Scotland&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;Sumo&#39;</span><span class="p">:</span> <span class="s1">&#39;Japan&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;Taekwondo&#39;</span><span class="p">:</span> <span class="s1">&#39;South Korea&#39;</span><span class="p">}</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">sports</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Golf&#39;</span><span class="p">,</span> <span class="s1">&#39;Sumo&#39;</span><span class="p">,</span> <span class="s1">&#39;Hockey&#39;</span><span class="p">])</span>
+<span class="n">s</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>Golf      Scotland
+Sumo         Japan
+Hockey         NaN
+dtype: object
+</pre></div>
+
+
+<h1>Querying Series</h1>
+<div class="highlight"><pre><span></span><span class="c1"># creating a series</span>
+<span class="n">sports</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Archery&#39;</span><span class="p">:</span> <span class="s1">&#39;Bhutan&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;Golf&#39;</span><span class="p">:</span> <span class="s1">&#39;Scotland&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;Sumo&#39;</span><span class="p">:</span> <span class="s1">&#39;Japan&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;Taekwondo&#39;</span><span class="p">:</span> <span class="s1">&#39;South Korea&#39;</span><span class="p">}</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">sports</span><span class="p">)</span>
+<span class="n">s</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>Archery           Bhutan
+Golf            Scotland
+Sumo               Japan
+Taekwondo    South Korea
+dtype: object
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># locating the 4th element value</span>
+<span class="n">s</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>&#39;South Korea&#39;
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># getting value of golf key</span>
+<span class="n">s</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Golf&#39;</span><span class="p">]</span>
+
+<span class="c1"># iloc and loc are not methods but they are attributes</span>
+<span class="c1"># iloc and loc are used for &quot;row selection&quot; </span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>&#39;Scotland&#39;
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># pandas smartly recognizes this as you want query through iloc </span>
+<span class="n">s</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>&#39;South Korea&#39;
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># same goes with loc</span>
+<span class="n">s</span><span class="p">[</span><span class="s1">&#39;Golf&#39;</span><span class="p">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>&#39;Scotland&#39;
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># but if your labels are list of numbers then it can not recognize it as iloc or loc </span>
+<span class="n">sports</span> <span class="o">=</span> <span class="p">{</span><span class="mi">99</span><span class="p">:</span> <span class="s1">&#39;Bhutan&#39;</span><span class="p">,</span>
+          <span class="mi">100</span><span class="p">:</span> <span class="s1">&#39;Scotland&#39;</span><span class="p">,</span>
+          <span class="mi">101</span><span class="p">:</span> <span class="s1">&#39;Japan&#39;</span><span class="p">,</span>
+          <span class="mi">102</span><span class="p">:</span> <span class="s1">&#39;South Korea&#39;</span><span class="p">}</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">sports</span><span class="p">)</span>
+<span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1">#This won&#39;t call s.iloc[0] as one might expect, it fails to recognize weather to call iloc or loc</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>---------------------------------------------------------------------------
+
+KeyError                                  Traceback (most recent call last)
+
+&lt;ipython-input-21-2d9b4559f19a&gt; in &lt;module&gt;()
+      5           102: &#39;South Korea&#39;}
+      6 s = pd.Series(sports)
+----&gt; 7 s[0] #This won&#39;t call s.iloc[0] as one might expect, it fails to recognize weather to call iloc or loc
+
+
+/usr/local/lib/python3.5/dist-packages/pandas/core/series.py in __getitem__(self, key)
+    599         key = com._apply_if_callable(key, self)
+    600         try:
+--&gt; 601             result = self.index.get_value(self, key)
+    602 
+    603             if not is_scalar(result):
+
+
+/usr/local/lib/python3.5/dist-packages/pandas/core/indexes/base.py in get_value(self, series, key)
+   2475         try:
+   2476             return self._engine.get_value(s, k,
+-&gt; 2477                                           tz=getattr(series.dtype, &#39;tz&#39;, None))
+   2478         except KeyError as e1:
+   2479             if len(self) &gt; 0 and self.inferred_type in [&#39;integer&#39;, &#39;boolean&#39;]:
+
+
+pandas/_libs/index.pyx in pandas._libs.index.IndexEngine.get_value (pandas/_libs/index.c:4404)()
+
+
+pandas/_libs/index.pyx in pandas._libs.index.IndexEngine.get_value (pandas/_libs/index.c:4087)()
+
+
+pandas/_libs/index.pyx in pandas._libs.index.IndexEngine.get_loc (pandas/_libs/index.c:5126)()
+
+
+pandas/_libs/hashtable_class_helper.pxi in pandas._libs.hashtable.Int64HashTable.get_item (pandas/_libs/hashtable.c:14031)()
+
+
+pandas/_libs/hashtable_class_helper.pxi in pandas._libs.hashtable.Int64HashTable.get_item (pandas/_libs/hashtable.c:13975)()
+
+
+KeyError: 0
+</pre></div>
+
+
+<h2>performing operations</h2>
+<div class="highlight"><pre><span></span><span class="c1"># creating a series</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="mf">100.00</span><span class="p">,</span> <span class="mf">120.00</span><span class="p">,</span> <span class="mf">101.00</span><span class="p">,</span> <span class="mf">3.00</span><span class="p">])</span>
+<span class="n">s</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>0    100.0
+1    120.0
+2    101.0
+3      3.0
+dtype: float64
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># let&#39;s find sum </span>
+<span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+    <span class="n">total</span><span class="o">+=</span><span class="n">item</span>
+<span class="k">print</span><span class="p">(</span><span class="n">total</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>324.0
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># it worked but it&#39;s slow, it was serial. Let&#39;s make it more efficient</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="n">totoal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">total</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>324.0
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># both of these methods produces same result, let&#39;s find out which one is faster </span>
+
+<span class="c1">#this creates a big series of random numbers</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1000</span><span class="p">,</span><span class="mi">10000</span><span class="p">))</span>
+<span class="n">s</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>0    535
+1    201
+2    648
+3    599
+4    360
+dtype: int64
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># lenght of series </span>
+<span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>10000
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">n</span> <span class="mi">100</span>
+<span class="n">summary</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+    <span class="n">summary</span><span class="o">+=</span><span class="n">item</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>1.41 ms ± 172 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">n</span> <span class="mi">100</span>
+<span class="n">summary</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>157 µs ± 18.5 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># braodcasting :- apply the operation on each value in the series</span>
+<span class="n">s</span><span class="o">+=</span> <span class="mi">2</span>
+<span class="n">s</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>0    537
+1    203
+2    650
+3    601
+4    362
+dtype: int64
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># Now let&#39;s compare time required for broadcasting by normal operation and pandas series method</span>
+<span class="c1"># this is how normal method will look like</span>
+<span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">value</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>0    539
+1    205
+2    652
+3    603
+4    364
+dtype: int64
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">n</span> <span class="mi">10</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1000</span><span class="p">,</span><span class="mi">10000</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">=</span> <span class="n">value</span><span class="o">+</span><span class="mi">2</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>1.14 s ± 224 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">n</span> <span class="mi">10</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1000</span><span class="p">,</span><span class="mi">10000</span><span class="p">))</span>
+<span class="n">s</span><span class="o">+=</span><span class="mi">2</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>546 µs ± 99.3 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># mixed data types in series, pandas automatically changes underlaying numpy data types </span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="n">s</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Animal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Bears&#39;</span>
+<span class="n">s</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>0             1
+1             2
+2             3
+Animal    Bears
+dtype: object
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># when series not elements that are not unique and how it&#39;s different conceptually from relational databases</span>
+<span class="n">original_sports</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">({</span><span class="s1">&#39;Archery&#39;</span><span class="p">:</span> <span class="s1">&#39;Bhutan&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;Golf&#39;</span><span class="p">:</span> <span class="s1">&#39;Scotland&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;Sumo&#39;</span><span class="p">:</span> <span class="s1">&#39;Japan&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;Taekwondo&#39;</span><span class="p">:</span> <span class="s1">&#39;South Korea&#39;</span><span class="p">})</span>
+<span class="c1"># creating a new series </span>
+<span class="n">cricket_loving_countries</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="s1">&#39;Australia&#39;</span><span class="p">,</span>
+                                      <span class="s1">&#39;Barbados&#39;</span><span class="p">,</span>
+                                      <span class="s1">&#39;Pakistan&#39;</span><span class="p">,</span>
+                                      <span class="s1">&#39;England&#39;</span><span class="p">],</span> 
+                                   <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Cricket&#39;</span><span class="p">,</span>
+                                          <span class="s1">&#39;Cricket&#39;</span><span class="p">,</span>
+                                          <span class="s1">&#39;Cricket&#39;</span><span class="p">,</span>
+                                          <span class="s1">&#39;Cricket&#39;</span><span class="p">])</span>
+<span class="c1"># appending with first series. This actually crates a new series and does not affact the original one</span>
+<span class="n">all_countries</span> <span class="o">=</span> <span class="n">original_sports</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cricket_loving_countries</span><span class="p">)</span>
+<span class="n">all_countries</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>Archery           Bhutan
+Golf            Scotland
+Sumo               Japan
+Taekwondo    South Korea
+Cricket        Australia
+Cricket         Barbados
+Cricket         Pakistan
+Cricket          England
+dtype: object
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># original series</span>
+<span class="n">original_sports</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>Archery           Bhutan
+Golf            Scotland
+Sumo               Japan
+Taekwondo    South Korea
+dtype: object
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">cricket_loving_countries</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>Cricket    Australia
+Cricket     Barbados
+Cricket     Pakistan
+Cricket      England
+dtype: object
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># series returned for multiple items</span>
+<span class="n">all_countries</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Cricket&#39;</span><span class="p">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>Cricket    Australia
+Cricket     Barbados
+Cricket     Pakistan
+Cricket      England
+dtype: object
+</pre></div>
+
+
+<h1>The DataFrame Data Structure</h1>
+<div class="highlight"><pre><span></span><span class="c1"># DataFrame is conceptualy 2D series object, having index and multiple columns and each column having label</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="n">purchase_1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">({</span><span class="s1">&#39;Name&#39;</span><span class="p">:</span> <span class="s1">&#39;Chris&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;Item Purchased&#39;</span><span class="p">:</span> <span class="s1">&#39;Dog Food&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;Cost&#39;</span><span class="p">:</span> <span class="mf">22.50</span><span class="p">})</span>
+<span class="n">purchase_2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">({</span><span class="s1">&#39;Name&#39;</span><span class="p">:</span> <span class="s1">&#39;Kevyn&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;Item Purchased&#39;</span><span class="p">:</span> <span class="s1">&#39;Kitty Litter&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;Cost&#39;</span><span class="p">:</span> <span class="mf">2.50</span><span class="p">})</span>
+<span class="n">purchase_3</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">({</span><span class="s1">&#39;Name&#39;</span><span class="p">:</span> <span class="s1">&#39;Vinod&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;Item Purchased&#39;</span><span class="p">:</span> <span class="s1">&#39;Bird Seed&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;Cost&#39;</span><span class="p">:</span> <span class="mf">5.00</span><span class="p">})</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">purchase_1</span><span class="p">,</span> <span class="n">purchase_2</span><span class="p">,</span> <span class="n">purchase_3</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Store 1&#39;</span><span class="p">,</span> <span class="s1">&#39;Store 1&#39;</span><span class="p">,</span> <span class="s1">&#39;Store 2&#39;</span><span class="p">])</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Cost</th>
+      <th>Item Purchased</th>
+      <th>Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Store 1</th>
+      <td>22.5</td>
+      <td>Dog Food</td>
+      <td>Chris</td>
+    </tr>
+    <tr>
+      <th>Store 1</th>
+      <td>2.5</td>
+      <td>Kitty Litter</td>
+      <td>Kevyn</td>
+    </tr>
+    <tr>
+      <th>Store 2</th>
+      <td>5.0</td>
+      <td>Bird Seed</td>
+      <td>Vinod</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="highlight"><pre><span></span><span class="c1"># retreiving the items</span>
+<span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Store 2&#39;</span><span class="p">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>Cost                      5
+Item Purchased    Bird Seed
+Name                  Vinod
+Name: Store 2, dtype: object
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># the type of output </span>
+<span class="nb">type</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Store 2&#39;</span><span class="p">])</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>pandas.core.series.Series
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># index and columns can be non unique e.g Store 1 is repeated here.</span>
+<span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Store 1&#39;</span><span class="p">]</span>
+</pre></div>
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Cost</th>
+      <th>Item Purchased</th>
+      <th>Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Store 1</th>
+      <td>22.5</td>
+      <td>Dog Food</td>
+      <td>Chris</td>
+    </tr>
+    <tr>
+      <th>Store 1</th>
+      <td>2.5</td>
+      <td>Kitty Litter</td>
+      <td>Kevyn</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="highlight"><pre><span></span><span class="c1"># type of output</span>
+<span class="nb">type</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Store 1&#39;</span><span class="p">])</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>pandas.core.frame.DataFrame
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># if we want only cost column of Store 1 index</span>
+<span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Store 1&#39;</span><span class="p">][</span><span class="s1">&#39;Cost&#39;</span><span class="p">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>Store 1    22.5
+Store 1     2.5
+Name: Cost, dtype: float64
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># Transpose of given dataframe</span>
+<span class="n">df</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Store 1</th>
+      <th>Store 1</th>
+      <th>Store 2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Cost</th>
+      <td>22.5</td>
+      <td>2.5</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>Item Purchased</th>
+      <td>Dog Food</td>
+      <td>Kitty Litter</td>
+      <td>Bird Seed</td>
+    </tr>
+    <tr>
+      <th>Name</th>
+      <td>Chris</td>
+      <td>Kevyn</td>
+      <td>Vinod</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="highlight"><pre><span></span><span class="c1"># to get cost of all stores</span>
+<span class="n">df</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Cost&#39;</span><span class="p">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>Store 1    22.5
+Store 1     2.5
+Store 2       5
+Name: Cost, dtype: object
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># chaining, it comes with cost so btter to use another approach, for changing data chaining operation like below are not effective.</span>
+<span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Store 1&#39;</span><span class="p">,</span> <span class="s1">&#39;Cost&#39;</span><span class="p">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>Store 1    22.5
+Store 1     2.5
+Name: Cost, dtype: float64
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># avoid chaining and use this</span>
+<span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,[</span><span class="s1">&#39;Name&#39;</span><span class="p">,</span> <span class="s1">&#39;Cost&#39;</span><span class="p">]]</span>
+</pre></div>
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Cost</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Store 1</th>
+      <td>Chris</td>
+      <td>22.5</td>
+    </tr>
+    <tr>
+      <th>Store 1</th>
+      <td>Kevyn</td>
+      <td>2.5</td>
+    </tr>
+    <tr>
+      <th>Store 2</th>
+      <td>Vinod</td>
+      <td>5.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="highlight"><pre><span></span><span class="c1"># deleting data, drop takes either index or row lable.</span>
+<span class="c1"># drop doesn&#39;t change the original data frame and returns the copy of changed dataframe </span>
+<span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;Store 1&#39;</span><span class="p">)</span> 
+</pre></div>
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Cost</th>
+      <th>Item Purchased</th>
+      <th>Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Store 2</th>
+      <td>5.0</td>
+      <td>Bird Seed</td>
+      <td>Vinod</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="highlight"><pre><span></span><span class="c1"># original datafrmae is still intact</span>
+<span class="n">df</span>
+</pre></div>
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Cost</th>
+      <th>Item Purchased</th>
+      <th>Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Store 1</th>
+      <td>22.5</td>
+      <td>Dog Food</td>
+      <td>Chris</td>
+    </tr>
+    <tr>
+      <th>Store 1</th>
+      <td>2.5</td>
+      <td>Kitty Litter</td>
+      <td>Kevyn</td>
+    </tr>
+    <tr>
+      <th>Store 2</th>
+      <td>5.0</td>
+      <td>Bird Seed</td>
+      <td>Vinod</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="highlight"><pre><span></span><span class="c1"># normal practice while droping</span>
+<span class="n">copy_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">copy_df</span> <span class="o">=</span> <span class="n">copy_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;Store 1&#39;</span><span class="p">)</span>
+<span class="n">copy_df</span>
+</pre></div>
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Cost</th>
+      <th>Item Purchased</th>
+      <th>Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Store 2</th>
+      <td>5.0</td>
+      <td>Bird Seed</td>
+      <td>Vinod</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="highlight"><pre><span></span><span class="c1"># there are two options in drop function 1. inplace 2. dropping column </span>
+<span class="n">copy_df</span><span class="o">.</span><span class="n">drop</span><span class="err">?</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># deleting column</span>
+<span class="k">del</span> <span class="n">copy_df</span><span class="p">[</span><span class="s1">&#39;Name&#39;</span><span class="p">]</span>
+<span class="n">copy_df</span>
+</pre></div>
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Cost</th>
+      <th>Item Purchased</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Store 2</th>
+      <td>5.0</td>
+      <td>Bird Seed</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="highlight"><pre><span></span><span class="c1"># adding new column is as good as assigining to some new value</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;Location&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="n">df</span>
+</pre></div>
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Cost</th>
+      <th>Item Purchased</th>
+      <th>Name</th>
+      <th>Location</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Store 1</th>
+      <td>22.5</td>
+      <td>Dog Food</td>
+      <td>Chris</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>Store 1</th>
+      <td>2.5</td>
+      <td>Kitty Litter</td>
+      <td>Kevyn</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>Store 2</th>
+      <td>5.0</td>
+      <td>Bird Seed</td>
+      <td>Vinod</td>
+      <td>None</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h1>DataFrame indexing and Loading</h1>
+<div class="highlight"><pre><span></span><span class="c1"># pandas toolkit gives views on dataFrame that means if you reduce some columns from dataFrame and perform operations,</span>
+<span class="c1"># it will change the base dataframe too.</span>
+<span class="n">costs</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Cost&#39;</span><span class="p">]</span>
+<span class="n">costs</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>Store 1    22.5
+Store 1     2.5
+Store 2     5.0
+Name: Cost, dtype: float64
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># broadcasting on costs</span>
+<span class="n">costs</span><span class="o">+=</span><span class="mi">2</span>
+<span class="n">costs</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>Store 1    24.5
+Store 1     4.5
+Store 2     7.0
+Name: Cost, dtype: float64
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># it changed original dataFrame too</span>
+<span class="n">df</span>
+</pre></div>
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Cost</th>
+      <th>Item Purchased</th>
+      <th>Name</th>
+      <th>Location</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Store 1</th>
+      <td>24.5</td>
+      <td>Dog Food</td>
+      <td>Chris</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>Store 1</th>
+      <td>4.5</td>
+      <td>Kitty Litter</td>
+      <td>Kevyn</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>Store 2</th>
+      <td>7.0</td>
+      <td>Bird Seed</td>
+      <td>Vinod</td>
+      <td>None</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="highlight"><pre><span></span><span class="c1"># priting the contents of olympics.csv</span>
+<span class="err">!</span><span class="n">cat</span> <span class="n">olympics</span><span class="o">.</span><span class="n">csv</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+,№ Summer,01 !,02 !,03 !,Total,№ Winter,01 !,02 !,03 !,Total,№ Games,01 !,02 !,03 !,Combined total
+Afghanistan (AFG),13,0,0,2,2,0,0,0,0,0,13,0,0,2,2
+Algeria (ALG),12,5,2,8,15,3,0,0,0,0,15,5,2,8,15
+Argentina (ARG),23,18,24,28,70,18,0,0,0,0,41,18,24,28,70
+Armenia (ARM),5,1,2,9,12,6,0,0,0,0,11,1,2,9,12
+Australasia (ANZ) [ANZ],2,3,4,5,12,0,0,0,0,0,2,3,4,5,12
+Australia (AUS) [AUS] [Z],25,139,152,177,468,18,5,3,4,12,43,144,155,181,480
+Austria (AUT),26,18,33,35,86,22,59,78,81,218,48,77,111,116,304
+Azerbaijan (AZE),5,6,5,15,26,5,0,0,0,0,10,6,5,15,26
+Bahamas (BAH),15,5,2,5,12,0,0,0,0,0,15,5,2,5,12
+Bahrain (BRN),8,0,0,1,1,0,0,0,0,0,8,0,0,1,1
+Barbados (BAR) [BAR],11,0,0,1,1,0,0,0,0,0,11,0,0,1,1
+Belarus (BLR),5,12,24,39,75,6,6,4,5,15,11,18,28,44,90
+Belgium (BEL),25,37,52,53,142,20,1,1,3,5,45,38,53,56,147
+Bermuda (BER),17,0,0,1,1,7,0,0,0,0,24,0,0,1,1
+Bohemia (BOH) [BOH] [Z],3,0,1,3,4,0,0,0,0,0,3,0,1,3,4
+Botswana (BOT),9,0,1,0,1,0,0,0,0,0,9,0,1,0,1
+Brazil (BRA),21,23,30,55,108,7,0,0,0,0,28,23,30,55,108
+British West Indies (BWI) [BWI],1,0,0,2,2,0,0,0,0,0,1,0,0,2,2
+Bulgaria (BUL) [H],19,51,85,78,214,19,1,2,3,6,38,52,87,81,220
+Burundi (BDI),5,1,0,0,1,0,0,0,0,0,5,1,0,0,1
+Cameroon (CMR),13,3,1,1,5,1,0,0,0,0,14,3,1,1,5
+Canada (CAN),25,59,99,121,279,22,62,56,52,170,47,121,155,173,449
+Chile (CHI) [I],22,2,7,4,13,16,0,0,0,0,38,2,7,4,13
+China (CHN) [CHN],9,201,146,126,473,10,12,22,19,53,19,213,168,145,526
+Colombia (COL),18,2,6,11,19,1,0,0,0,0,19,2,6,11,19
+Costa Rica (CRC),14,1,1,2,4,6,0,0,0,0,20,1,1,2,4
+Ivory Coast (CIV) [CIV],12,0,1,0,1,0,0,0,0,0,12,0,1,0,1
+Croatia (CRO),6,6,7,10,23,7,4,6,1,11,13,10,13,11,34
+Cuba (CUB) [Z],19,72,67,70,209,0,0,0,0,0,19,72,67,70,209
+Cyprus (CYP),9,0,1,0,1,10,0,0,0,0,19,0,1,0,1
+Czech Republic (CZE) [CZE],5,14,15,15,44,6,7,9,8,24,11,21,24,23,68
+Czechoslovakia (TCH) [TCH],16,49,49,45,143,16,2,8,15,25,32,51,57,60,168
+Denmark (DEN) [Z],26,43,68,68,179,13,0,1,0,1,39,43,69,68,180
+Djibouti (DJI) [B],7,0,0,1,1,0,0,0,0,0,7,0,0,1,1
+Dominican Republic (DOM),13,3,2,1,6,0,0,0,0,0,13,3,2,1,6
+Ecuador (ECU),13,1,1,0,2,0,0,0,0,0,13,1,1,0,2
+Egypt (EGY) [EGY] [Z],21,7,9,10,26,1,0,0,0,0,22,7,9,10,26
+Eritrea (ERI),4,0,0,1,1,0,0,0,0,0,4,0,0,1,1
+Estonia (EST),11,9,9,15,33,9,4,2,1,7,20,13,11,16,40
+Ethiopia (ETH),12,21,7,17,45,2,0,0,0,0,14,21,7,17,45
+Finland (FIN),24,101,84,117,302,22,42,62,57,161,46,143,146,174,463
+France (FRA) [O] [P] [Z],27,202,223,246,671,22,31,31,47,109,49,233,254,293,780
+Gabon (GAB),9,0,1,0,1,0,0,0,0,0,9,0,1,0,1
+Georgia (GEO),5,6,5,14,25,6,0,0,0,0,11,6,5,14,25
+Germany (GER) [GER] [Z],15,174,182,217,573,11,78,78,53,209,26,252,260,270,782
+United Team of Germany (EUA) [EUA],3,28,54,36,118,3,8,6,5,19,6,36,60,41,137
+East Germany (GDR) [GDR],5,153,129,127,409,6,39,36,35,110,11,192,165,162,519
+West Germany (FRG) [FRG],5,56,67,81,204,6,11,15,13,39,11,67,82,94,243
+Ghana (GHA) [GHA],13,0,1,3,4,1,0,0,0,0,14,0,1,3,4
+Great Britain (GBR) [GBR] [Z],27,236,272,272,780,22,10,4,12,26,49,246,276,284,806
+Greece (GRE) [Z],27,30,42,39,111,18,0,0,0,0,45,30,42,39,111
+Grenada (GRN),8,1,0,0,1,0,0,0,0,0,8,1,0,0,1
+Guatemala (GUA),13,0,1,0,1,1,0,0,0,0,14,0,1,0,1
+Guyana (GUY) [GUY],16,0,0,1,1,0,0,0,0,0,16,0,0,1,1
+Haiti (HAI) [J],14,0,1,1,2,0,0,0,0,0,14,0,1,1,2
+Hong Kong (HKG) [HKG],15,1,1,1,3,4,0,0,0,0,19,1,1,1,3
+Hungary (HUN),25,167,144,165,476,22,0,2,4,6,47,167,146,169,482
+Iceland (ISL),19,0,2,2,4,17,0,0,0,0,36,0,2,2,4
+India (IND) [F],23,9,6,11,26,9,0,0,0,0,32,9,6,11,26
+Indonesia (INA),14,6,10,11,27,0,0,0,0,0,14,6,10,11,27
+Iran (IRI) [K],15,15,20,25,60,10,0,0,0,0,25,15,20,25,60
+Iraq (IRQ),13,0,0,1,1,0,0,0,0,0,13,0,0,1,1
+Ireland (IRL),20,9,8,12,29,6,0,0,0,0,26,9,8,12,29
+Israel (ISR),15,1,1,5,7,6,0,0,0,0,21,1,1,5,7
+Italy (ITA) [M] [S],26,198,166,185,549,22,37,34,43,114,48,235,200,228,663
+Jamaica (JAM) [JAM],16,17,30,20,67,7,0,0,0,0,23,17,30,20,67
+Japan (JPN),21,130,126,142,398,20,10,17,18,45,41,140,143,160,443
+Kazakhstan (KAZ),5,16,17,19,52,6,1,3,3,7,11,17,20,22,59
+Kenya (KEN),13,25,32,29,86,3,0,0,0,0,16,25,32,29,86
+North Korea (PRK),9,14,12,21,47,8,0,1,1,2,17,14,13,22,49
+South Korea (KOR),16,81,82,80,243,17,26,17,10,53,33,107,99,90,296
+Kuwait (KUW),12,0,0,2,2,0,0,0,0,0,12,0,0,2,2
+Kyrgyzstan (KGZ),5,0,1,2,3,6,0,0,0,0,11,0,1,2,3
+Latvia (LAT),10,3,11,5,19,10,0,4,3,7,20,3,15,8,26
+Lebanon (LIB),16,0,2,2,4,16,0,0,0,0,32,0,2,2,4
+Liechtenstein (LIE),16,0,0,0,0,18,2,2,5,9,34,2,2,5,9
+Lithuania (LTU),8,6,5,10,21,8,0,0,0,0,16,6,5,10,21
+Luxembourg (LUX) [O],22,1,1,0,2,8,0,2,0,2,30,1,3,0,4
+Macedonia (MKD),5,0,0,1,1,5,0,0,0,0,10,0,0,1,1
+Malaysia (MAS) [MAS],12,0,3,3,6,0,0,0,0,0,12,0,3,3,6
+Mauritius (MRI),8,0,0,1,1,0,0,0,0,0,8,0,0,1,1
+Mexico (MEX),22,13,21,28,62,8,0,0,0,0,30,13,21,28,62
+Moldova (MDA),5,0,2,5,7,6,0,0,0,0,11,0,2,5,7
+Mongolia (MGL),12,2,9,13,24,13,0,0,0,0,25,2,9,13,24
+Montenegro (MNE),2,0,1,0,1,2,0,0,0,0,4,0,1,0,1
+Morocco (MAR),13,6,5,11,22,6,0,0,0,0,19,6,5,11,22
+Mozambique (MOZ),9,1,0,1,2,0,0,0,0,0,9,1,0,1,2
+Namibia (NAM),6,0,4,0,4,0,0,0,0,0,6,0,4,0,4
+Netherlands (NED) [Z],25,77,85,104,266,20,37,38,35,110,45,114,123,139,376
+Netherlands Antilles (AHO) [AHO] [I],13,0,1,0,1,2,0,0,0,0,15,0,1,0,1
+New Zealand (NZL) [NZL],22,42,18,39,99,15,0,1,0,1,37,42,19,39,100
+Niger (NIG),11,0,0,1,1,0,0,0,0,0,11,0,0,1,1
+Nigeria (NGR),15,3,8,12,23,0,0,0,0,0,15,3,8,12,23
+Norway (NOR) [Q],24,56,49,43,148,22,118,111,100,329,46,174,160,143,477
+Pakistan (PAK),16,3,3,4,10,2,0,0,0,0,18,3,3,4,10
+Panama (PAN),16,1,0,2,3,0,0,0,0,0,16,1,0,2,3
+Paraguay (PAR),11,0,1,0,1,1,0,0,0,0,12,0,1,0,1
+Peru (PER) [L],17,1,3,0,4,2,0,0,0,0,19,1,3,0,4
+Philippines (PHI),20,0,2,7,9,4,0,0,0,0,24,0,2,7,9
+Poland (POL),20,64,82,125,271,22,6,7,7,20,42,70,89,132,291
+Portugal (POR),23,4,8,11,23,7,0,0,0,0,30,4,8,11,23
+Puerto Rico (PUR),17,0,2,6,8,6,0,0,0,0,23,0,2,6,8
+Qatar (QAT),8,0,0,4,4,0,0,0,0,0,8,0,0,4,4
+Romania (ROU),20,88,94,119,301,20,0,0,1,1,40,88,94,120,302
+Russia (RUS) [RUS],5,132,121,142,395,6,49,40,35,124,11,181,161,177,519
+Russian Empire (RU1) [RU1],3,1,4,3,8,0,0,0,0,0,3,1,4,3,8
+Soviet Union (URS) [URS],9,395,319,296,1010,9,78,57,59,194,18,473,376,355,1204
+Unified Team (EUN) [EUN],1,45,38,29,112,1,9,6,8,23,2,54,44,37,135
+Saudi Arabia (KSA),10,0,1,2,3,0,0,0,0,0,10,0,1,2,3
+Senegal (SEN),13,0,1,0,1,5,0,0,0,0,18,0,1,0,1
+Serbia (SRB) [SRB],3,1,2,4,7,2,0,0,0,0,5,1,2,4,7
+Serbia and Montenegro (SCG) [SCG],3,2,4,3,9,3,0,0,0,0,6,2,4,3,9
+Singapore (SIN),15,0,2,2,4,0,0,0,0,0,15,0,2,2,4
+Slovakia (SVK) [SVK],5,7,9,8,24,6,2,2,1,5,11,9,11,9,29
+Slovenia (SLO),6,4,6,9,19,7,2,4,9,15,13,6,10,18,34
+South Africa (RSA),18,23,26,27,76,6,0,0,0,0,24,23,26,27,76
+Spain (ESP) [Z],22,37,59,35,131,19,1,0,1,2,41,38,59,36,133
+Sri Lanka (SRI) [SRI],16,0,2,0,2,0,0,0,0,0,16,0,2,0,2
+Sudan (SUD),11,0,1,0,1,0,0,0,0,0,11,0,1,0,1
+Suriname (SUR) [E],11,1,0,1,2,0,0,0,0,0,11,1,0,1,2
+Sweden (SWE) [Z],26,143,164,176,483,22,50,40,54,144,48,193,204,230,627
+Switzerland (SUI),27,47,73,65,185,22,50,40,48,138,49,97,113,113,323
+Syria (SYR),12,1,1,1,3,0,0,0,0,0,12,1,1,1,3
+Chinese Taipei (TPE) [TPE] [TPE2],13,2,7,12,21,11,0,0,0,0,24,2,7,12,21
+Tajikistan (TJK),5,0,1,2,3,4,0,0,0,0,9,0,1,2,3
+Tanzania (TAN) [TAN],12,0,2,0,2,0,0,0,0,0,12,0,2,0,2
+Thailand (THA),15,7,6,11,24,3,0,0,0,0,18,7,6,11,24
+Togo (TOG),9,0,0,1,1,1,0,0,0,0,10,0,0,1,1
+Tonga (TGA),8,0,1,0,1,1,0,0,0,0,9,0,1,0,1
+Trinidad and Tobago (TRI) [TRI],16,2,5,11,18,3,0,0,0,0,19,2,5,11,18
+Tunisia (TUN),13,3,3,4,10,0,0,0,0,0,13,3,3,4,10
+Turkey (TUR),21,39,25,24,88,16,0,0,0,0,37,39,25,24,88
+Uganda (UGA),14,2,3,2,7,0,0,0,0,0,14,2,3,2,7
+Ukraine (UKR),5,33,27,55,115,6,2,1,4,7,11,35,28,59,122
+United Arab Emirates (UAE),8,1,0,0,1,0,0,0,0,0,8,1,0,0,1
+United States (USA) [P] [Q] [R] [Z],26,976,757,666,2399,22,96,102,84,282,48,1072,859,750,2681
+Uruguay (URU),20,2,2,6,10,1,0,0,0,0,21,2,2,6,10
+Uzbekistan (UZB),5,5,5,10,20,6,1,0,0,1,11,6,5,10,21
+Venezuela (VEN),17,2,2,8,12,4,0,0,0,0,21,2,2,8,12
+Vietnam (VIE),14,0,2,0,2,0,0,0,0,0,14,0,2,0,2
+Virgin Islands (ISV),11,0,1,0,1,7,0,0,0,0,18,0,1,0,1
+Yugoslavia (YUG) [YUG],16,26,29,28,83,14,0,3,1,4,30,26,32,29,87
+Independent Olympic Participants (IOP) [IOP],1,0,1,2,3,0,0,0,0,0,1,0,1,2,3
+Zambia (ZAM) [ZAM],12,0,1,1,2,0,0,0,0,0,12,0,1,1,2
+Zimbabwe (ZIM) [ZIM],12,3,4,1,8,1,0,0,0,0,13,3,4,1,8
+Mixed team (ZZX) [ZZX],3,8,5,4,17,0,0,0,0,0,3,8,5,4,17
+Totals,27,4809,4775,5130,14714,22,959,958,948,2865,49,5768,5733,6078,17579
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># adding this data dataframe</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;olympics.csv&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+      <th>3</th>
+      <th>4</th>
+      <th>5</th>
+      <th>6</th>
+      <th>7</th>
+      <th>8</th>
+      <th>9</th>
+      <th>10</th>
+      <th>11</th>
+      <th>12</th>
+      <th>13</th>
+      <th>14</th>
+      <th>15</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>NaN</td>
+      <td>№ Summer</td>
+      <td>01 !</td>
+      <td>02 !</td>
+      <td>03 !</td>
+      <td>Total</td>
+      <td>№ Winter</td>
+      <td>01 !</td>
+      <td>02 !</td>
+      <td>03 !</td>
+      <td>Total</td>
+      <td>№ Games</td>
+      <td>01 !</td>
+      <td>02 !</td>
+      <td>03 !</td>
+      <td>Combined total</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Afghanistan (AFG)</td>
+      <td>13</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>13</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Algeria (ALG)</td>
+      <td>12</td>
+      <td>5</td>
+      <td>2</td>
+      <td>8</td>
+      <td>15</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>15</td>
+      <td>5</td>
+      <td>2</td>
+      <td>8</td>
+      <td>15</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Argentina (ARG)</td>
+      <td>23</td>
+      <td>18</td>
+      <td>24</td>
+      <td>28</td>
+      <td>70</td>
+      <td>18</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>41</td>
+      <td>18</td>
+      <td>24</td>
+      <td>28</td>
+      <td>70</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Armenia (ARM)</td>
+      <td>5</td>
+      <td>1</td>
+      <td>2</td>
+      <td>9</td>
+      <td>12</td>
+      <td>6</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>11</td>
+      <td>1</td>
+      <td>2</td>
+      <td>9</td>
+      <td>12</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="highlight"><pre><span></span><span class="c1"># but we want countries column as index and skip the first row</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;olympics.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>№ Summer</th>
+      <th>01 !</th>
+      <th>02 !</th>
+      <th>03 !</th>
+      <th>Total</th>
+      <th>№ Winter</th>
+      <th>01 !.1</th>
+      <th>02 !.1</th>
+      <th>03 !.1</th>
+      <th>Total.1</th>
+      <th>№ Games</th>
+      <th>01 !.2</th>
+      <th>02 !.2</th>
+      <th>03 !.2</th>
+      <th>Combined total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Afghanistan (AFG)</th>
+      <td>13</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>13</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>Algeria (ALG)</th>
+      <td>12</td>
+      <td>5</td>
+      <td>2</td>
+      <td>8</td>
+      <td>15</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>15</td>
+      <td>5</td>
+      <td>2</td>
+      <td>8</td>
+      <td>15</td>
+    </tr>
+    <tr>
+      <th>Argentina (ARG)</th>
+      <td>23</td>
+      <td>18</td>
+      <td>24</td>
+      <td>28</td>
+      <td>70</td>
+      <td>18</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>41</td>
+      <td>18</td>
+      <td>24</td>
+      <td>28</td>
+      <td>70</td>
+    </tr>
+    <tr>
+      <th>Armenia (ARM)</th>
+      <td>5</td>
+      <td>1</td>
+      <td>2</td>
+      <td>9</td>
+      <td>12</td>
+      <td>6</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>11</td>
+      <td>1</td>
+      <td>2</td>
+      <td>9</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>Australasia (ANZ) [ANZ]</th>
+      <td>2</td>
+      <td>3</td>
+      <td>4</td>
+      <td>5</td>
+      <td>12</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+      <td>3</td>
+      <td>4</td>
+      <td>5</td>
+      <td>12</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="highlight"><pre><span></span><span class="c1"># renaming the columns</span>
+<span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">col</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;01&#39;</span><span class="p">:</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="n">col</span><span class="p">:</span><span class="s1">&#39;Gold&#39;</span> <span class="o">+</span> <span class="n">col</span><span class="p">[</span><span class="mi">4</span><span class="p">:]},</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">col</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;02&#39;</span><span class="p">:</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="n">col</span><span class="p">:</span><span class="s1">&#39;Silver&#39;</span> <span class="o">+</span> <span class="n">col</span><span class="p">[</span><span class="mi">4</span><span class="p">:]},</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">col</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;03&#39;</span><span class="p">:</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="n">col</span><span class="p">:</span><span class="s1">&#39;Bronze&#39;</span> <span class="o">+</span> <span class="n">col</span><span class="p">[</span><span class="mi">4</span><span class="p">:]},</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">col</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;№&#39;</span><span class="p">:</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="n">col</span><span class="p">:</span><span class="s1">&#39;#&#39;</span> <span class="o">+</span> <span class="n">col</span><span class="p">[</span><span class="mi">1</span><span class="p">:]},</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> 
+
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th># Summer</th>
+      <th>Gold</th>
+      <th>Silver</th>
+      <th>Bronze</th>
+      <th>Total</th>
+      <th># Winter</th>
+      <th>Gold.1</th>
+      <th>Silver.1</th>
+      <th>Bronze.1</th>
+      <th>Total.1</th>
+      <th># Games</th>
+      <th>Gold.2</th>
+      <th>Silver.2</th>
+      <th>Bronze.2</th>
+      <th>Combined total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Afghanistan (AFG)</th>
+      <td>13</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>13</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>Algeria (ALG)</th>
+      <td>12</td>
+      <td>5</td>
+      <td>2</td>
+      <td>8</td>
+      <td>15</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>15</td>
+      <td>5</td>
+      <td>2</td>
+      <td>8</td>
+      <td>15</td>
+    </tr>
+    <tr>
+      <th>Argentina (ARG)</th>
+      <td>23</td>
+      <td>18</td>
+      <td>24</td>
+      <td>28</td>
+      <td>70</td>
+      <td>18</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>41</td>
+      <td>18</td>
+      <td>24</td>
+      <td>28</td>
+      <td>70</td>
+    </tr>
+    <tr>
+      <th>Armenia (ARM)</th>
+      <td>5</td>
+      <td>1</td>
+      <td>2</td>
+      <td>9</td>
+      <td>12</td>
+      <td>6</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>11</td>
+      <td>1</td>
+      <td>2</td>
+      <td>9</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>Australasia (ANZ) [ANZ]</th>
+      <td>2</td>
+      <td>3</td>
+      <td>4</td>
+      <td>5</td>
+      <td>12</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+      <td>3</td>
+      <td>4</td>
+      <td>5</td>
+      <td>12</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h1>Querying a DataFrame</h1>
+<div class="highlight"><pre><span></span><span class="c1"># boolean masking </span>
+<span class="c1"># we want countries those have won at least one gold medal</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;Gold&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>Afghanistan (AFG)                               False
+Algeria (ALG)                                    True
+Argentina (ARG)                                  True
+Armenia (ARM)                                    True
+Australasia (ANZ) [ANZ]                          True
+Australia (AUS) [AUS] [Z]                        True
+Austria (AUT)                                    True
+Azerbaijan (AZE)                                 True
+Bahamas (BAH)                                    True
+Bahrain (BRN)                                   False
+Barbados (BAR) [BAR]                            False
+Belarus (BLR)                                    True
+Belgium (BEL)                                    True
+Bermuda (BER)                                   False
+Bohemia (BOH) [BOH] [Z]                         False
+Botswana (BOT)                                  False
+Brazil (BRA)                                     True
+British West Indies (BWI) [BWI]                 False
+Bulgaria (BUL) [H]                               True
+Burundi (BDI)                                    True
+Cameroon (CMR)                                   True
+Canada (CAN)                                     True
+Chile (CHI) [I]                                  True
+China (CHN) [CHN]                                True
+Colombia (COL)                                   True
+Costa Rica (CRC)                                 True
+Ivory Coast (CIV) [CIV]                         False
+Croatia (CRO)                                    True
+Cuba (CUB) [Z]                                   True
+Cyprus (CYP)                                    False
+                                                ...  
+Sri Lanka (SRI) [SRI]                           False
+Sudan (SUD)                                     False
+Suriname (SUR) [E]                               True
+Sweden (SWE) [Z]                                 True
+Switzerland (SUI)                                True
+Syria (SYR)                                      True
+Chinese Taipei (TPE) [TPE] [TPE2]                True
+Tajikistan (TJK)                                False
+Tanzania (TAN) [TAN]                            False
+Thailand (THA)                                   True
+Togo (TOG)                                      False
+Tonga (TGA)                                     False
+Trinidad and Tobago (TRI) [TRI]                  True
+Tunisia (TUN)                                    True
+Turkey (TUR)                                     True
+Uganda (UGA)                                     True
+Ukraine (UKR)                                    True
+United Arab Emirates (UAE)                       True
+United States (USA) [P] [Q] [R] [Z]              True
+Uruguay (URU)                                    True
+Uzbekistan (UZB)                                 True
+Venezuela (VEN)                                  True
+Vietnam (VIE)                                   False
+Virgin Islands (ISV)                            False
+Yugoslavia (YUG) [YUG]                           True
+Independent Olympic Participants (IOP) [IOP]    False
+Zambia (ZAM) [ZAM]                              False
+Zimbabwe (ZIM) [ZIM]                             True
+Mixed team (ZZX) [ZZX]                           True
+Totals                                           True
+Name: Gold, Length: 147, dtype: bool
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># applying boolean masking using where </span>
+<span class="n">only_gold</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Gold&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">only_gold</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th># Summer</th>
+      <th>Gold</th>
+      <th>Silver</th>
+      <th>Bronze</th>
+      <th>Total</th>
+      <th># Winter</th>
+      <th>Gold.1</th>
+      <th>Silver.1</th>
+      <th>Bronze.1</th>
+      <th>Total.1</th>
+      <th># Games</th>
+      <th>Gold.2</th>
+      <th>Silver.2</th>
+      <th>Bronze.2</th>
+      <th>Combined total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Afghanistan (AFG)</th>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>Algeria (ALG)</th>
+      <td>12.0</td>
+      <td>5.0</td>
+      <td>2.0</td>
+      <td>8.0</td>
+      <td>15.0</td>
+      <td>3.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>15.0</td>
+      <td>5.0</td>
+      <td>2.0</td>
+      <td>8.0</td>
+      <td>15.0</td>
+    </tr>
+    <tr>
+      <th>Argentina (ARG)</th>
+      <td>23.0</td>
+      <td>18.0</td>
+      <td>24.0</td>
+      <td>28.0</td>
+      <td>70.0</td>
+      <td>18.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>41.0</td>
+      <td>18.0</td>
+      <td>24.0</td>
+      <td>28.0</td>
+      <td>70.0</td>
+    </tr>
+    <tr>
+      <th>Armenia (ARM)</th>
+      <td>5.0</td>
+      <td>1.0</td>
+      <td>2.0</td>
+      <td>9.0</td>
+      <td>12.0</td>
+      <td>6.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>11.0</td>
+      <td>1.0</td>
+      <td>2.0</td>
+      <td>9.0</td>
+      <td>12.0</td>
+    </tr>
+    <tr>
+      <th>Australasia (ANZ) [ANZ]</th>
+      <td>2.0</td>
+      <td>3.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>12.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>2.0</td>
+      <td>3.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>12.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="highlight"><pre><span></span><span class="c1"># NaN values is ignored while doing operations. For example</span>
+<span class="n">only_gold</span><span class="p">[</span><span class="s1">&#39;Gold&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>100
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Gold&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>147
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># if we want to drop the rows which has no data, use dropna()</span>
+<span class="n">only_gold</span> <span class="o">=</span> <span class="n">only_gold</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+<span class="n">only_gold</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th># Summer</th>
+      <th>Gold</th>
+      <th>Silver</th>
+      <th>Bronze</th>
+      <th>Total</th>
+      <th># Winter</th>
+      <th>Gold.1</th>
+      <th>Silver.1</th>
+      <th>Bronze.1</th>
+      <th>Total.1</th>
+      <th># Games</th>
+      <th>Gold.2</th>
+      <th>Silver.2</th>
+      <th>Bronze.2</th>
+      <th>Combined total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Algeria (ALG)</th>
+      <td>12.0</td>
+      <td>5.0</td>
+      <td>2.0</td>
+      <td>8.0</td>
+      <td>15.0</td>
+      <td>3.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>15.0</td>
+      <td>5.0</td>
+      <td>2.0</td>
+      <td>8.0</td>
+      <td>15.0</td>
+    </tr>
+    <tr>
+      <th>Argentina (ARG)</th>
+      <td>23.0</td>
+      <td>18.0</td>
+      <td>24.0</td>
+      <td>28.0</td>
+      <td>70.0</td>
+      <td>18.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>41.0</td>
+      <td>18.0</td>
+      <td>24.0</td>
+      <td>28.0</td>
+      <td>70.0</td>
+    </tr>
+    <tr>
+      <th>Armenia (ARM)</th>
+      <td>5.0</td>
+      <td>1.0</td>
+      <td>2.0</td>
+      <td>9.0</td>
+      <td>12.0</td>
+      <td>6.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>11.0</td>
+      <td>1.0</td>
+      <td>2.0</td>
+      <td>9.0</td>
+      <td>12.0</td>
+    </tr>
+    <tr>
+      <th>Australasia (ANZ) [ANZ]</th>
+      <td>2.0</td>
+      <td>3.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>12.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>2.0</td>
+      <td>3.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>12.0</td>
+    </tr>
+    <tr>
+      <th>Australia (AUS) [AUS] [Z]</th>
+      <td>25.0</td>
+      <td>139.0</td>
+      <td>152.0</td>
+      <td>177.0</td>
+      <td>468.0</td>
+      <td>18.0</td>
+      <td>5.0</td>
+      <td>3.0</td>
+      <td>4.0</td>
+      <td>12.0</td>
+      <td>43.0</td>
+      <td>144.0</td>
+      <td>155.0</td>
+      <td>181.0</td>
+      <td>480.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="highlight"><pre><span></span><span class="n">only_gold</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Gold&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+<span class="n">only_gold</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th># Summer</th>
+      <th>Gold</th>
+      <th>Silver</th>
+      <th>Bronze</th>
+      <th>Total</th>
+      <th># Winter</th>
+      <th>Gold.1</th>
+      <th>Silver.1</th>
+      <th>Bronze.1</th>
+      <th>Total.1</th>
+      <th># Games</th>
+      <th>Gold.2</th>
+      <th>Silver.2</th>
+      <th>Bronze.2</th>
+      <th>Combined total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Algeria (ALG)</th>
+      <td>12</td>
+      <td>5</td>
+      <td>2</td>
+      <td>8</td>
+      <td>15</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>15</td>
+      <td>5</td>
+      <td>2</td>
+      <td>8</td>
+      <td>15</td>
+    </tr>
+    <tr>
+      <th>Argentina (ARG)</th>
+      <td>23</td>
+      <td>18</td>
+      <td>24</td>
+      <td>28</td>
+      <td>70</td>
+      <td>18</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>41</td>
+      <td>18</td>
+      <td>24</td>
+      <td>28</td>
+      <td>70</td>
+    </tr>
+    <tr>
+      <th>Armenia (ARM)</th>
+      <td>5</td>
+      <td>1</td>
+      <td>2</td>
+      <td>9</td>
+      <td>12</td>
+      <td>6</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>11</td>
+      <td>1</td>
+      <td>2</td>
+      <td>9</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>Australasia (ANZ) [ANZ]</th>
+      <td>2</td>
+      <td>3</td>
+      <td>4</td>
+      <td>5</td>
+      <td>12</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+      <td>3</td>
+      <td>4</td>
+      <td>5</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>Australia (AUS) [AUS] [Z]</th>
+      <td>25</td>
+      <td>139</td>
+      <td>152</td>
+      <td>177</td>
+      <td>468</td>
+      <td>18</td>
+      <td>5</td>
+      <td>3</td>
+      <td>4</td>
+      <td>12</td>
+      <td>43</td>
+      <td>144</td>
+      <td>155</td>
+      <td>181</td>
+      <td>480</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="highlight"><pre><span></span><span class="c1"># Combining boolean mask to create complex queries</span>
+<span class="c1"># e.g we want all the countries who reveived gold in summer olympics as well as gold in winter olympics</span>
+<span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">[(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Gold&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Gold.1&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)])</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>101
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># countries that won gold in winter olympics and not in summer olympics </span>
+<span class="n">df</span><span class="p">[(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Gold.1&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Gold&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)]</span>
+</pre></div>
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th># Summer</th>
+      <th>Gold</th>
+      <th>Silver</th>
+      <th>Bronze</th>
+      <th>Total</th>
+      <th># Winter</th>
+      <th>Gold.1</th>
+      <th>Silver.1</th>
+      <th>Bronze.1</th>
+      <th>Total.1</th>
+      <th># Games</th>
+      <th>Gold.2</th>
+      <th>Silver.2</th>
+      <th>Bronze.2</th>
+      <th>Combined total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Liechtenstein (LIE)</th>
+      <td>16</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>18</td>
+      <td>2</td>
+      <td>2</td>
+      <td>5</td>
+      <td>9</td>
+      <td>34</td>
+      <td>2</td>
+      <td>2</td>
+      <td>5</td>
+      <td>9</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h1>Indexing Dataframes</h1>
+<div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th># Summer</th>
+      <th>Gold</th>
+      <th>Silver</th>
+      <th>Bronze</th>
+      <th>Total</th>
+      <th># Winter</th>
+      <th>Gold.1</th>
+      <th>Silver.1</th>
+      <th>Bronze.1</th>
+      <th>Total.1</th>
+      <th># Games</th>
+      <th>Gold.2</th>
+      <th>Silver.2</th>
+      <th>Bronze.2</th>
+      <th>Combined total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Afghanistan (AFG)</th>
+      <td>13</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>13</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>Algeria (ALG)</th>
+      <td>12</td>
+      <td>5</td>
+      <td>2</td>
+      <td>8</td>
+      <td>15</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>15</td>
+      <td>5</td>
+      <td>2</td>
+      <td>8</td>
+      <td>15</td>
+    </tr>
+    <tr>
+      <th>Argentina (ARG)</th>
+      <td>23</td>
+      <td>18</td>
+      <td>24</td>
+      <td>28</td>
+      <td>70</td>
+      <td>18</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>41</td>
+      <td>18</td>
+      <td>24</td>
+      <td>28</td>
+      <td>70</td>
+    </tr>
+    <tr>
+      <th>Armenia (ARM)</th>
+      <td>5</td>
+      <td>1</td>
+      <td>2</td>
+      <td>9</td>
+      <td>12</td>
+      <td>6</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>11</td>
+      <td>1</td>
+      <td>2</td>
+      <td>9</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>Australasia (ANZ) [ANZ]</th>
+      <td>2</td>
+      <td>3</td>
+      <td>4</td>
+      <td>5</td>
+      <td>12</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+      <td>3</td>
+      <td>4</td>
+      <td>5</td>
+      <td>12</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="highlight"><pre><span></span><span class="c1"># we want index by no of golds and not by country names</span>
+<span class="c1"># First we preserve the existing indexes into an colummn, because set_index doesn&#39;t preserve previous indexes</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;country&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Gold&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th># Summer</th>
+      <th>Silver</th>
+      <th>Bronze</th>
+      <th>Total</th>
+      <th># Winter</th>
+      <th>Gold.1</th>
+      <th>Silver.1</th>
+      <th>Bronze.1</th>
+      <th>Total.1</th>
+      <th># Games</th>
+      <th>Gold.2</th>
+      <th>Silver.2</th>
+      <th>Bronze.2</th>
+      <th>Combined total</th>
+      <th>country</th>
+    </tr>
+    <tr>
+      <th>Gold</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>13</td>
+      <td>0</td>
+      <td>2</td>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>13</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+      <td>2</td>
+      <td>Afghanistan (AFG)</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>12</td>
+      <td>2</td>
+      <td>8</td>
+      <td>15</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>15</td>
+      <td>5</td>
+      <td>2</td>
+      <td>8</td>
+      <td>15</td>
+      <td>Algeria (ALG)</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>23</td>
+      <td>24</td>
+      <td>28</td>
+      <td>70</td>
+      <td>18</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>41</td>
+      <td>18</td>
+      <td>24</td>
+      <td>28</td>
+      <td>70</td>
+      <td>Argentina (ARG)</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>5</td>
+      <td>2</td>
+      <td>9</td>
+      <td>12</td>
+      <td>6</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>11</td>
+      <td>1</td>
+      <td>2</td>
+      <td>9</td>
+      <td>12</td>
+      <td>Armenia (ARM)</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2</td>
+      <td>4</td>
+      <td>5</td>
+      <td>12</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+      <td>3</td>
+      <td>4</td>
+      <td>5</td>
+      <td>12</td>
+      <td>Australasia (ANZ) [ANZ]</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="highlight"><pre><span></span><span class="c1"># to get rid of index completely &amp; create default numbered index</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Gold</th>
+      <th># Summer</th>
+      <th>Silver</th>
+      <th>Bronze</th>
+      <th>Total</th>
+      <th># Winter</th>
+      <th>Gold.1</th>
+      <th>Silver.1</th>
+      <th>Bronze.1</th>
+      <th>Total.1</th>
+      <th># Games</th>
+      <th>Gold.2</th>
+      <th>Silver.2</th>
+      <th>Bronze.2</th>
+      <th>Combined total</th>
+      <th>country</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>13</td>
+      <td>0</td>
+      <td>2</td>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>13</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+      <td>2</td>
+      <td>Afghanistan (AFG)</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>5</td>
+      <td>12</td>
+      <td>2</td>
+      <td>8</td>
+      <td>15</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>15</td>
+      <td>5</td>
+      <td>2</td>
+      <td>8</td>
+      <td>15</td>
+      <td>Algeria (ALG)</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>18</td>
+      <td>23</td>
+      <td>24</td>
+      <td>28</td>
+      <td>70</td>
+      <td>18</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>41</td>
+      <td>18</td>
+      <td>24</td>
+      <td>28</td>
+      <td>70</td>
+      <td>Argentina (ARG)</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1</td>
+      <td>5</td>
+      <td>2</td>
+      <td>9</td>
+      <td>12</td>
+      <td>6</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>11</td>
+      <td>1</td>
+      <td>2</td>
+      <td>9</td>
+      <td>12</td>
+      <td>Armenia (ARM)</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>3</td>
+      <td>2</td>
+      <td>4</td>
+      <td>5</td>
+      <td>12</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+      <td>3</td>
+      <td>4</td>
+      <td>5</td>
+      <td>12</td>
+      <td>Australasia (ANZ) [ANZ]</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="highlight"><pre><span></span><span class="c1"># pandas support multilevel index like composite keys in databases</span>
+<span class="c1"># To visualize this, lets load different dataset</span>
+<span class="c1"># Similarly you can have heirarchial </span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;census.csv&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>SUMLEV</th>
+      <th>REGION</th>
+      <th>DIVISION</th>
+      <th>STATE</th>
+      <th>COUNTY</th>
+      <th>STNAME</th>
+      <th>CTYNAME</th>
+      <th>CENSUS2010POP</th>
+      <th>ESTIMATESBASE2010</th>
+      <th>POPESTIMATE2010</th>
+      <th>...</th>
+      <th>RDOMESTICMIG2011</th>
+      <th>RDOMESTICMIG2012</th>
+      <th>RDOMESTICMIG2013</th>
+      <th>RDOMESTICMIG2014</th>
+      <th>RDOMESTICMIG2015</th>
+      <th>RNETMIG2011</th>
+      <th>RNETMIG2012</th>
+      <th>RNETMIG2013</th>
+      <th>RNETMIG2014</th>
+      <th>RNETMIG2015</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>40</td>
+      <td>3</td>
+      <td>6</td>
+      <td>1</td>
+      <td>0</td>
+      <td>Alabama</td>
+      <td>Alabama</td>
+      <td>4779736</td>
+      <td>4780127</td>
+      <td>4785161</td>
+      <td>...</td>
+      <td>0.002295</td>
+      <td>-0.193196</td>
+      <td>0.381066</td>
+      <td>0.582002</td>
+      <td>-0.467369</td>
+      <td>1.030015</td>
+      <td>0.826644</td>
+      <td>1.383282</td>
+      <td>1.724718</td>
+      <td>0.712594</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>50</td>
+      <td>3</td>
+      <td>6</td>
+      <td>1</td>
+      <td>1</td>
+      <td>Alabama</td>
+      <td>Autauga County</td>
+      <td>54571</td>
+      <td>54571</td>
+      <td>54660</td>
+      <td>...</td>
+      <td>7.242091</td>
+      <td>-2.915927</td>
+      <td>-3.012349</td>
+      <td>2.265971</td>
+      <td>-2.530799</td>
+      <td>7.606016</td>
+      <td>-2.626146</td>
+      <td>-2.722002</td>
+      <td>2.592270</td>
+      <td>-2.187333</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>50</td>
+      <td>3</td>
+      <td>6</td>
+      <td>1</td>
+      <td>3</td>
+      <td>Alabama</td>
+      <td>Baldwin County</td>
+      <td>182265</td>
+      <td>182265</td>
+      <td>183193</td>
+      <td>...</td>
+      <td>14.832960</td>
+      <td>17.647293</td>
+      <td>21.845705</td>
+      <td>19.243287</td>
+      <td>17.197872</td>
+      <td>15.844176</td>
+      <td>18.559627</td>
+      <td>22.727626</td>
+      <td>20.317142</td>
+      <td>18.293499</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>50</td>
+      <td>3</td>
+      <td>6</td>
+      <td>1</td>
+      <td>5</td>
+      <td>Alabama</td>
+      <td>Barbour County</td>
+      <td>27457</td>
+      <td>27457</td>
+      <td>27341</td>
+      <td>...</td>
+      <td>-4.728132</td>
+      <td>-2.500690</td>
+      <td>-7.056824</td>
+      <td>-3.904217</td>
+      <td>-10.543299</td>
+      <td>-4.874741</td>
+      <td>-2.758113</td>
+      <td>-7.167664</td>
+      <td>-3.978583</td>
+      <td>-10.543299</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>50</td>
+      <td>3</td>
+      <td>6</td>
+      <td>1</td>
+      <td>7</td>
+      <td>Alabama</td>
+      <td>Bibb County</td>
+      <td>22915</td>
+      <td>22919</td>
+      <td>22861</td>
+      <td>...</td>
+      <td>-5.527043</td>
+      <td>-5.068871</td>
+      <td>-6.201001</td>
+      <td>-0.177537</td>
+      <td>0.177258</td>
+      <td>-5.088389</td>
+      <td>-4.363636</td>
+      <td>-5.403729</td>
+      <td>0.754533</td>
+      <td>1.107861</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 100 columns</p>
+</div>
+
+<div class="highlight"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;SUMLEV&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>array([40, 50])
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># keep summary at county level</span>
+<span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;SUMLEV&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">50</span><span class="p">]</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>SUMLEV</th>
+      <th>REGION</th>
+      <th>DIVISION</th>
+      <th>STATE</th>
+      <th>COUNTY</th>
+      <th>STNAME</th>
+      <th>CTYNAME</th>
+      <th>CENSUS2010POP</th>
+      <th>ESTIMATESBASE2010</th>
+      <th>POPESTIMATE2010</th>
+      <th>...</th>
+      <th>RDOMESTICMIG2011</th>
+      <th>RDOMESTICMIG2012</th>
+      <th>RDOMESTICMIG2013</th>
+      <th>RDOMESTICMIG2014</th>
+      <th>RDOMESTICMIG2015</th>
+      <th>RNETMIG2011</th>
+      <th>RNETMIG2012</th>
+      <th>RNETMIG2013</th>
+      <th>RNETMIG2014</th>
+      <th>RNETMIG2015</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>50</td>
+      <td>3</td>
+      <td>6</td>
+      <td>1</td>
+      <td>1</td>
+      <td>Alabama</td>
+      <td>Autauga County</td>
+      <td>54571</td>
+      <td>54571</td>
+      <td>54660</td>
+      <td>...</td>
+      <td>7.242091</td>
+      <td>-2.915927</td>
+      <td>-3.012349</td>
+      <td>2.265971</td>
+      <td>-2.530799</td>
+      <td>7.606016</td>
+      <td>-2.626146</td>
+      <td>-2.722002</td>
+      <td>2.592270</td>
+      <td>-2.187333</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>50</td>
+      <td>3</td>
+      <td>6</td>
+      <td>1</td>
+      <td>3</td>
+      <td>Alabama</td>
+      <td>Baldwin County</td>
+      <td>182265</td>
+      <td>182265</td>
+      <td>183193</td>
+      <td>...</td>
+      <td>14.832960</td>
+      <td>17.647293</td>
+      <td>21.845705</td>
+      <td>19.243287</td>
+      <td>17.197872</td>
+      <td>15.844176</td>
+      <td>18.559627</td>
+      <td>22.727626</td>
+      <td>20.317142</td>
+      <td>18.293499</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>50</td>
+      <td>3</td>
+      <td>6</td>
+      <td>1</td>
+      <td>5</td>
+      <td>Alabama</td>
+      <td>Barbour County</td>
+      <td>27457</td>
+      <td>27457</td>
+      <td>27341</td>
+      <td>...</td>
+      <td>-4.728132</td>
+      <td>-2.500690</td>
+      <td>-7.056824</td>
+      <td>-3.904217</td>
+      <td>-10.543299</td>
+      <td>-4.874741</td>
+      <td>-2.758113</td>
+      <td>-7.167664</td>
+      <td>-3.978583</td>
+      <td>-10.543299</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>50</td>
+      <td>3</td>
+      <td>6</td>
+      <td>1</td>
+      <td>7</td>
+      <td>Alabama</td>
+      <td>Bibb County</td>
+      <td>22915</td>
+      <td>22919</td>
+      <td>22861</td>
+      <td>...</td>
+      <td>-5.527043</td>
+      <td>-5.068871</td>
+      <td>-6.201001</td>
+      <td>-0.177537</td>
+      <td>0.177258</td>
+      <td>-5.088389</td>
+      <td>-4.363636</td>
+      <td>-5.403729</td>
+      <td>0.754533</td>
+      <td>1.107861</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>50</td>
+      <td>3</td>
+      <td>6</td>
+      <td>1</td>
+      <td>9</td>
+      <td>Alabama</td>
+      <td>Blount County</td>
+      <td>57322</td>
+      <td>57322</td>
+      <td>57373</td>
+      <td>...</td>
+      <td>1.807375</td>
+      <td>-1.177622</td>
+      <td>-1.748766</td>
+      <td>-2.062535</td>
+      <td>-1.369970</td>
+      <td>1.859511</td>
+      <td>-0.848580</td>
+      <td>-1.402476</td>
+      <td>-1.577232</td>
+      <td>-0.884411</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 100 columns</p>
+</div>
+
+<div class="highlight"><pre><span></span><span class="c1"># keeping required columns only </span>
+<span class="n">columns_to_keep</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;STNAME&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;CTYNAME&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;BIRTHS2010&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;BIRTHS2011&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;BIRTHS2012&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;BIRTHS2013&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;BIRTHS2014&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;BIRTHS2015&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;POPESTIMATE2010&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;POPESTIMATE2011&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;POPESTIMATE2012&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;POPESTIMATE2013&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;POPESTIMATE2014&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;POPESTIMATE2015&#39;</span><span class="p">]</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">columns_to_keep</span><span class="p">]</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>STNAME</th>
+      <th>CTYNAME</th>
+      <th>BIRTHS2010</th>
+      <th>BIRTHS2011</th>
+      <th>BIRTHS2012</th>
+      <th>BIRTHS2013</th>
+      <th>BIRTHS2014</th>
+      <th>BIRTHS2015</th>
+      <th>POPESTIMATE2010</th>
+      <th>POPESTIMATE2011</th>
+      <th>POPESTIMATE2012</th>
+      <th>POPESTIMATE2013</th>
+      <th>POPESTIMATE2014</th>
+      <th>POPESTIMATE2015</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>Alabama</td>
+      <td>Autauga County</td>
+      <td>151</td>
+      <td>636</td>
+      <td>615</td>
+      <td>574</td>
+      <td>623</td>
+      <td>600</td>
+      <td>54660</td>
+      <td>55253</td>
+      <td>55175</td>
+      <td>55038</td>
+      <td>55290</td>
+      <td>55347</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Alabama</td>
+      <td>Baldwin County</td>
+      <td>517</td>
+      <td>2187</td>
+      <td>2092</td>
+      <td>2160</td>
+      <td>2186</td>
+      <td>2240</td>
+      <td>183193</td>
+      <td>186659</td>
+      <td>190396</td>
+      <td>195126</td>
+      <td>199713</td>
+      <td>203709</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Alabama</td>
+      <td>Barbour County</td>
+      <td>70</td>
+      <td>335</td>
+      <td>300</td>
+      <td>283</td>
+      <td>260</td>
+      <td>269</td>
+      <td>27341</td>
+      <td>27226</td>
+      <td>27159</td>
+      <td>26973</td>
+      <td>26815</td>
+      <td>26489</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Alabama</td>
+      <td>Bibb County</td>
+      <td>44</td>
+      <td>266</td>
+      <td>245</td>
+      <td>259</td>
+      <td>247</td>
+      <td>253</td>
+      <td>22861</td>
+      <td>22733</td>
+      <td>22642</td>
+      <td>22512</td>
+      <td>22549</td>
+      <td>22583</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Alabama</td>
+      <td>Blount County</td>
+      <td>183</td>
+      <td>744</td>
+      <td>710</td>
+      <td>646</td>
+      <td>618</td>
+      <td>603</td>
+      <td>57373</td>
+      <td>57711</td>
+      <td>57776</td>
+      <td>57734</td>
+      <td>57658</td>
+      <td>57673</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="highlight"><pre><span></span><span class="c1"># setting composite index</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s1">&#39;STNAME&#39;</span><span class="p">,</span> <span class="s1">&#39;CTYNAME&#39;</span><span class="p">])</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>BIRTHS2010</th>
+      <th>BIRTHS2011</th>
+      <th>BIRTHS2012</th>
+      <th>BIRTHS2013</th>
+      <th>BIRTHS2014</th>
+      <th>BIRTHS2015</th>
+      <th>POPESTIMATE2010</th>
+      <th>POPESTIMATE2011</th>
+      <th>POPESTIMATE2012</th>
+      <th>POPESTIMATE2013</th>
+      <th>POPESTIMATE2014</th>
+      <th>POPESTIMATE2015</th>
+    </tr>
+    <tr>
+      <th>STNAME</th>
+      <th>CTYNAME</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="5" valign="top">Alabama</th>
+      <th>Autauga County</th>
+      <td>151</td>
+      <td>636</td>
+      <td>615</td>
+      <td>574</td>
+      <td>623</td>
+      <td>600</td>
+      <td>54660</td>
+      <td>55253</td>
+      <td>55175</td>
+      <td>55038</td>
+      <td>55290</td>
+      <td>55347</td>
+    </tr>
+    <tr>
+      <th>Baldwin County</th>
+      <td>517</td>
+      <td>2187</td>
+      <td>2092</td>
+      <td>2160</td>
+      <td>2186</td>
+      <td>2240</td>
+      <td>183193</td>
+      <td>186659</td>
+      <td>190396</td>
+      <td>195126</td>
+      <td>199713</td>
+      <td>203709</td>
+    </tr>
+    <tr>
+      <th>Barbour County</th>
+      <td>70</td>
+      <td>335</td>
+      <td>300</td>
+      <td>283</td>
+      <td>260</td>
+      <td>269</td>
+      <td>27341</td>
+      <td>27226</td>
+      <td>27159</td>
+      <td>26973</td>
+      <td>26815</td>
+      <td>26489</td>
+    </tr>
+    <tr>
+      <th>Bibb County</th>
+      <td>44</td>
+      <td>266</td>
+      <td>245</td>
+      <td>259</td>
+      <td>247</td>
+      <td>253</td>
+      <td>22861</td>
+      <td>22733</td>
+      <td>22642</td>
+      <td>22512</td>
+      <td>22549</td>
+      <td>22583</td>
+    </tr>
+    <tr>
+      <th>Blount County</th>
+      <td>183</td>
+      <td>744</td>
+      <td>710</td>
+      <td>646</td>
+      <td>618</td>
+      <td>603</td>
+      <td>57373</td>
+      <td>57711</td>
+      <td>57776</td>
+      <td>57734</td>
+      <td>57658</td>
+      <td>57673</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="highlight"><pre><span></span><span class="c1"># how to query multilevel index</span>
+<span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Michigan&#39;</span><span class="p">,</span> <span class="s1">&#39;Washtenaw County&#39;</span><span class="p">]</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>BIRTHS2010            977
+BIRTHS2011           3826
+BIRTHS2012           3780
+BIRTHS2013           3662
+BIRTHS2014           3683
+BIRTHS2015           3709
+POPESTIMATE2010    345563
+POPESTIMATE2011    349048
+POPESTIMATE2012    351213
+POPESTIMATE2013    354289
+POPESTIMATE2014    357029
+POPESTIMATE2015    358880
+Name: (Michigan, Washtenaw County), dtype: int64
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="c1"># comparing how counties</span>
+<span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span> <span class="p">[(</span><span class="s1">&#39;Michigan&#39;</span><span class="p">,</span> <span class="s1">&#39;Washtenaw County&#39;</span><span class="p">),</span>
+         <span class="p">(</span><span class="s1">&#39;Michigan&#39;</span><span class="p">,</span> <span class="s1">&#39;Wayne County&#39;</span><span class="p">)]</span> <span class="p">]</span>
+</pre></div>
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>BIRTHS2010</th>
+      <th>BIRTHS2011</th>
+      <th>BIRTHS2012</th>
+      <th>BIRTHS2013</th>
+      <th>BIRTHS2014</th>
+      <th>BIRTHS2015</th>
+      <th>POPESTIMATE2010</th>
+      <th>POPESTIMATE2011</th>
+      <th>POPESTIMATE2012</th>
+      <th>POPESTIMATE2013</th>
+      <th>POPESTIMATE2014</th>
+      <th>POPESTIMATE2015</th>
+    </tr>
+    <tr>
+      <th>STNAME</th>
+      <th>CTYNAME</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="2" valign="top">Michigan</th>
+      <th>Washtenaw County</th>
+      <td>977</td>
+      <td>3826</td>
+      <td>3780</td>
+      <td>3662</td>
+      <td>3683</td>
+      <td>3709</td>
+      <td>345563</td>
+      <td>349048</td>
+      <td>351213</td>
+      <td>354289</td>
+      <td>357029</td>
+      <td>358880</td>
+    </tr>
+    <tr>
+      <th>Wayne County</th>
+      <td>5918</td>
+      <td>23819</td>
+      <td>23270</td>
+      <td>23377</td>
+      <td>23607</td>
+      <td>23586</td>
+      <td>1815199</td>
+      <td>1801273</td>
+      <td>1792514</td>
+      <td>1775713</td>
+      <td>1766008</td>
+      <td>1759335</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p><br><br/>
+<em>Credits <a href="https://www.coursera.org/learn/python-data-analysis">Introduction to Data Science in Python</a></em></p>
           </div>
         </article>
       </aside>
   <div class="is-hidden-print">
     <h2 class="subtitle">Other articles</h2>
     <div class="columns is-multiline">
+        <div class="column is-half-tablet is-one-third-desktop">
+          <div class="card is-fullwidth is-fullheight">
+            <div class="card-content">
+              <a href="/2017/Jul/09/probablity_distributions.html">
+                <h3 class="title is-5">Probablity Distributions</h3>
+                <div class="heading subtitle">Sun 09 July 2017</div>
+                <div><p>Probablity Distributions from programmer's perspective</p></div>
+              </a>
+            </div>
+          </div>
+        </div>
         <div class="column is-half-tablet is-one-third-desktop">
           <div class="card is-fullwidth is-fullheight">
             <div class="card-content">
@@ -87,32 +3502,21 @@
         <div class="column is-half-tablet is-one-third-desktop">
           <div class="card is-fullwidth is-fullheight">
             <div class="card-content">
+              <a href="/2016/Jul/03/welcome.html">
+                <h3 class="title is-5">Welcome</h3>
+                <div class="heading subtitle">Sun 03 July 2016</div>
+                <div><p>Welcome to Data Science blog !</p></div>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="column is-half-tablet is-one-third-desktop">
+          <div class="card is-fullwidth is-fullheight">
+            <div class="card-content">
               <a href="/2016/Mar/13/deep_learning_image_classification.html">
                 <h3 class="title is-5">Deep Learning Image Classification</h3>
                 <div class="heading subtitle">Sun 13 March 2016</div>
                 <div><p>Deep Learning Image Classification</p></div>
-              </a>
-            </div>
-          </div>
-        </div>
-        <div class="column is-half-tablet is-one-third-desktop">
-          <div class="card is-fullwidth is-fullheight">
-            <div class="card-content">
-              <a href="/2016/Mar/12/image_retrieval_using_deep_features.html">
-                <h3 class="title is-5">Image Retrieval using Deep Features</h3>
-                <div class="heading subtitle">Sat 12 March 2016</div>
-                <div><p>Image Retrieval using Deep Features</p></div>
-              </a>
-            </div>
-          </div>
-        </div>
-        <div class="column is-half-tablet is-one-third-desktop">
-          <div class="card is-fullwidth is-fullheight">
-            <div class="card-content">
-              <a href="/2016/Mar/06/song_recommendation_system.html">
-                <h3 class="title is-5">Song Recommendation System</h3>
-                <div class="heading subtitle">Sun 06 March 2016</div>
-                <div><p>Song Recommendation System</p></div>
               </a>
             </div>
           </div>
@@ -137,17 +3541,17 @@
       <aside class="menu">
           <p class="menu-label">Links</p>
           <ul class="menu-list">
-              <li><a href="http://getpelican.com/">
+              <li><a href="https://dataskeptic.com/podcast">
                 <span class="icon is-small"><i class="fa fa-globe fa-fw"></i></span>
-                <span class="link-text">Pelican</span>
+                <span class="link-text">Data Skeptic</span>
               </a></li>
-              <li><a href="http://python.org/">
+              <li><a href="http://planetpython.org/">
                 <span class="icon is-small"><i class="fa fa-globe fa-fw"></i></span>
-                <span class="link-text">Python.org</span>
+                <span class="link-text">Python Planet</span>
               </a></li>
-              <li><a href="http://jinja.pocoo.org/">
+              <li><a href="https://news.ycombinator.com/">
                 <span class="icon is-small"><i class="fa fa-globe fa-fw"></i></span>
-                <span class="link-text">Jinja2</span>
+                <span class="link-text">Hacker News</span>
               </a></li>
           </ul>
 <p class="menu-label">Social</p>
@@ -177,7 +3581,7 @@
 
 <footer class="footer">
   <div class="container has-text-centered">
- <p class="subtitle">Can Machine Think ..</p>    <p><a href="https://github.com/textbook/bulrush">Bulrush</a> theme for
+ <p class="subtitle">The question of whether a computer can think is no more interesting than the question of whether a submarine can swim.― Edsger W. Dijkstra</p>    <p><a href="https://github.com/textbook/bulrush">Bulrush</a> theme for
         <a href="https://blog.getpelican.com/">Pelican</a>
       | <span class="icon is-small"><i class="fa fa-html5"></i></span> HTML 5
       | <span class="icon is-small"><i class="fa fa-css3"></i></span> CSS 3
