@@ -53,7 +53,7 @@
       <aside id="featured" class="body">
         <article>
           <h1 class="title">
-            <a href="/2017/Sep/20/psycopg_postgresql_adapter_for_python.html">Psycopg:- PostgreSQL adapter for Python</a>
+            <a href="/2017/Sep/20/psycopg_postgresql_adapter_for_python.html">Psycopg: PostgreSQL adapter for Python</a>
           </h1>
 <footer class="post-info">
   <abbr class="published" title="2017-09-20T00:08:00+05:30">
@@ -203,8 +203,29 @@ The following tutorials will demonstrate basic usage of psycopg.</p>
 </pre></div>
 
 
-<div class="highlight"><pre><span></span>
-</pre></div>-->
+<p>PostgreSQL does not have an autocommit option which means all the queries will have to be executed within a transaction. This functionality ensures data integrity and allows for appropriate error handling but there are queries that can not be run from within a transaction. Let's see example.</p>
+<div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;DROP DATABASE tempd&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Failed to drop our test database!&quot;</span><span class="p">,</span><span class="n">ex</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>Failed to drop our test database! DROP DATABASE cannot run inside a transaction block
+</pre></div>
+
+
+<p>PostgreSQL can not drop databases within a transaction, if you want to drop database within a transaction then you need to change the isolation level of the database as follows.</p>
+<div class="highlight"><pre><span></span><span class="n">conn</span><span class="o">.</span><span class="n">set_isolation_level</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+
+
+<p>This was short introduction to psycopg, I hope you have enjoyed. See you next time.</p>
+<h2>References</h2>
+<ol>
+<li><a href="http://initd.org/psycopg/">Psycopg official website</a></li>
+<li><a href="https://wiki.postgresql.org/wiki/Psycopg2_Tutorial">PostgreSQL psycopg2 tutorial</a></li>
+</ol>-->
 	    <p>Getting started with PostgreSQL in python using psycopg</p>
             <a href="/2017/Sep/20/psycopg_postgresql_adapter_for_python.html">Read more...</a>
           </div>
